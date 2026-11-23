@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Archivos generados
+frontend/dist/
+backend/dist/
+build/
+
+# Variables de entorno y datos privados
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+
+# Registros
+*.log
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
