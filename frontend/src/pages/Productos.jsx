@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { solicitar } from "../services/api";
 import useProductos from "../hooks/useProductos";
 import useFetch from "../hooks/useFetch";
+import { coincideBusqueda } from "../utils/buscar";
 
 // Valores iniciales del formulario de registro.
 const PRODUCTO_VACIO = {
@@ -182,12 +182,24 @@ function Productos() {
     // Formulario de registro (arriba de la página).
     const [nuevoProducto, setNuevoProducto] = useState(PRODUCTO_VACIO);
     const [mensaje, setMensaje] = useState("");
+
+    // Texto del buscador de la tabla.
+    const [busqueda, setBusqueda] = useState("");
     const [guardando, setGuardando] = useState(false);
 
     // Ventana de edición: null cuando está cerrada.
     const [productoEditando, setProductoEditando] = useState(null);
     const [errorEdicion, setErrorEdicion] = useState("");
     const [guardandoEdicion, setGuardandoEdicion] = useState(false);
+
+    // Productos que coinciden con lo que se escribió en el buscador.
+    const productosFiltrados = productos.filter((producto) =>
+        coincideBusqueda(busqueda, [
+            producto.nombre,
+            producto.descripcion,
+            producto.categoria
+        ])
+    );
 
     const cambiarNuevo = (campo, valor) => {
         setNuevoProducto((anterior) => ({ ...anterior, [campo]: valor }));
@@ -319,8 +331,6 @@ function Productos() {
                     <h1>Gestión de productos</h1>
                     <p>Administrá el inventario de tu kiosco.</p>
                 </div>
-
-                <Link to="/dashboard">Volver al inicio</Link>
             </header>
 
             <section className="seccion-inventario">
@@ -356,12 +366,25 @@ function Productos() {
             </section>
 
             <section className="seccion-inventario">
-                <h2>Productos registrados</h2>
+                <div className="encabezado-tabla">
+                    <h2>Productos registrados</h2>
+
+                    <input
+                        type="search"
+                        className="buscador"
+                        aria-label="Buscar"
+                        placeholder="Buscar por nombre, descripción o categoría"
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                    />
+                </div>
 
                 {cargando ? (
                     <p>Cargando productos...</p>
                 ) : productos.length === 0 ? (
                     <p>No hay productos registrados.</p>
+                ) : productosFiltrados.length === 0 ? (
+                    <p>No se encontraron productos para "{busqueda}".</p>
                 ) : (
                     <div className="tabla-contenedor">
                         <table>
@@ -378,7 +401,7 @@ function Productos() {
                             </thead>
 
                             <tbody>
-                                {productos.map((producto) => (
+                                {productosFiltrados.map((producto) => (
                                     <tr key={producto.id_producto}>
                                         <td>{producto.nombre}</td>
                                         <td>

@@ -168,22 +168,23 @@ function Reportes() {
                             </div>
                         )}
 
-                        <button
-                            type="button"
-                            onClick={descargarReporte}
-                            disabled={productos.length === 0}
-                            style={{ marginTop: "20px" }}
-                        >
-                            Descargar reporte CSV
-                        </button>
+                        {/* Botones del reporte en una misma fila */}
+                        <div className="acciones-tabla">
+                            <button
+                                type="button"
+                                onClick={descargarReporte}
+                                disabled={productos.length === 0}
+                            >
+                                Descargar reporte CSV
+                            </button>
 
-                        <button
-                            type="button"
-                            onClick={cargarReporte}
-                            style={{ marginTop: "20px", marginLeft: "10px" }}
-                        >
-                            Actualizar reporte
-                        </button>
+                            <button
+                                type="button"
+                                onClick={cargarReporte}
+                            >
+                                Actualizar reporte
+                            </button>
+                        </div>
                     </section>
                 </>
             )}

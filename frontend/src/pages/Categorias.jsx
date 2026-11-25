@@ -1,8 +1,8 @@
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { solicitar } from "../services/api";
 import useFetch from "../hooks/useFetch";
+import { coincideBusqueda } from "../utils/buscar";
 
 // Validamos los datos con las mismas reglas que el backend.
 const validarCategoria = (nombre, descripcion) => {
@@ -35,6 +35,14 @@ function Categorias() {
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [mensaje, setMensaje] = useState("");
+
+    // Texto del buscador de la tabla.
+    const [busqueda, setBusqueda] = useState("");
+
+    // Categorías que coinciden con lo que se escribió en el buscador.
+    const categoriasFiltradas = categorias.filter((categoria) =>
+        coincideBusqueda(busqueda, [categoria.nombre, categoria.descripcion])
+    );
 
     // Ventana de edición: null cuando está cerrada.
     const [categoriaEditando, setCategoriaEditando] = useState(null);
@@ -172,8 +180,6 @@ function Categorias() {
                     <h1>Gestión de categorías</h1>
                     <p>Organizá los productos de tu kiosco.</p>
                 </div>
-
-                <Link to="/dashboard">Volver al inicio</Link>
             </header>
 
             <section className="seccion-inventario">
@@ -220,7 +226,18 @@ function Categorias() {
             </section>
 
             <section className="seccion-inventario">
-                <h2>Categorías registradas</h2>
+                <div className="encabezado-tabla">
+                    <h2>Categorías registradas</h2>
+
+                    <input
+                        type="search"
+                        className="buscador"
+                        aria-label="Buscar"
+                        placeholder="Buscar por nombre o descripción"
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                    />
+                </div>
 
                 {cargando ? (
                     <p>Cargando categorías...</p>
@@ -236,7 +253,7 @@ function Categorias() {
                             </thead>
 
                             <tbody>
-                                {categorias.map((categoria) => (
+                                {categoriasFiltradas.map((categoria) => (
                                     <tr key={categoria.id_categoria}>
                                         <td>{categoria.nombre}</td>
                                         <td>{categoria.descripcion}</td>
@@ -264,10 +281,12 @@ function Categorias() {
                                     </tr>
                                 ))}
 
-                                {categorias.length === 0 && (
+                                {categoriasFiltradas.length === 0 && (
                                     <tr>
                                         <td colSpan="3">
-                                            No hay categorías registradas.
+                                            {categorias.length === 0
+                                                ? "No hay categorías registradas."
+                                                : `No se encontraron categorías para "${busqueda}".`}
                                         </td>
                                     </tr>
                                 )}

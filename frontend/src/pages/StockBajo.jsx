@@ -1,5 +1,4 @@
 
-import { Link } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 
 function StockBajo() {
@@ -18,8 +17,6 @@ function StockBajo() {
                     <h1>Control de stock bajo</h1>
                     <p>Productos que necesitan reposición.</p>
                 </div>
-
-                <Link to="/dashboard">Volver al inicio</Link>
             </header>
 
             <section className="seccion-inventario">

@@ -1337,3 +1337,435 @@ textarea {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* ==========================================
+   AJUSTE A LA PANTALLA (COMPUTADORA)
+   Todo entra en la ventana sin scrollear la página.
+   Las tablas largas se desplazan por dentro,
+   con los títulos de las columnas fijos.
+========================================== */
+
+.acciones-tabla {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+@media (min-width: 901px) {
+    /* Estructura: menú y contenido ocupan exactamente la ventana */
+    .layout-dashboard {
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .menu-lateral {
+        height: 100vh;
+        min-height: 0;
+        padding: 60px 16px 14px;
+        overflow-y: auto;
+    }
+
+    .marca-dashboard {
+        margin-bottom: 12px;
+        padding: 10px;
+    }
+
+    .menu-separador {
+        padding: 6px 10px;
+    }
+
+    .navegacion-dashboard {
+        gap: 5px;
+    }
+
+    .enlace-menu {
+        padding: 9px 12px;
+    }
+
+    .menu-inferior {
+        padding-top: 12px;
+    }
+
+    .usuario-menu {
+        padding: 10px 6px;
+    }
+
+    .boton-cerrar-sesion {
+        padding: 9px 12px;
+    }
+
+    .contenido-seccion {
+        height: 100vh;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* Páginas internas: columna que llena la altura */
+    .contenido-seccion .pagina-inventario {
+        height: 100vh;
+        min-height: 0;
+        padding: 18px 26px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow: hidden;
+    }
+
+    .contenido-seccion .encabezado-dashboard {
+        flex-shrink: 0;
+        margin-bottom: 0;
+        padding: 12px 22px;
+    }
+
+    .contenido-seccion .encabezado-dashboard h1 {
+        font-size: 24px;
+    }
+
+    .contenido-seccion .encabezado-dashboard p {
+        margin-top: 0;
+        font-size: 14px;
+    }
+
+    .contenido-seccion .seccion-inventario {
+        flex-shrink: 0;
+        margin-top: 0;
+        padding: 14px 20px;
+    }
+
+    .contenido-seccion .seccion-inventario h2 {
+        margin-bottom: 10px;
+        font-size: 19px;
+    }
+
+    /* La última sección (la de la tabla) se queda con el espacio libre */
+    .contenido-seccion .pagina-inventario > .seccion-inventario:last-of-type {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .contenido-seccion .pagina-inventario > .seccion-inventario:last-of-type > h2 {
+        align-self: flex-start;
+    }
+
+    .contenido-seccion .pagina-inventario > .seccion-inventario:last-of-type > button {
+        align-self: flex-start;
+        flex-shrink: 0;
+    }
+
+    .contenido-seccion .tabla-contenedor {
+        flex: 1;
+        min-height: 0;
+        margin-top: 4px;
+        overflow: auto;
+    }
+
+    .contenido-seccion th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: 10px 14px;
+        background: var(--tinta);
+    }
+
+    .contenido-seccion td {
+        padding: 7px 14px;
+    }
+
+    .contenido-seccion .acciones-tabla {
+        flex-shrink: 0;
+        margin-top: 12px;
+    }
+
+    /* Formularios más compactos: los campos se acomodan en una fila */
+    /* Los campos crecen para llenar la fila; los que tienen texto de ayuda
+       (placeholder) son más anchos para que ese texto se lea completo */
+    .contenido-seccion .pagina-inventario > .seccion-inventario .formulario-inventario {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 14px;
+        margin-bottom: 0;
+    }
+
+    .contenido-seccion .pagina-inventario > .seccion-inventario .formulario-inventario .campo {
+        flex: 1 1 160px;
+    }
+
+    .contenido-seccion .pagina-inventario > .seccion-inventario .formulario-inventario .campo:has(input[placeholder]) {
+        flex: 1 1 260px;
+    }
+
+    .contenido-seccion .pagina-inventario > .seccion-inventario .formulario-inventario .acciones-formulario {
+        flex-basis: 100%;
+    }
+
+    .contenido-seccion .formulario-inventario label {
+        margin-bottom: 3px;
+        font-size: 12px;
+    }
+
+    .contenido-seccion .formulario-inventario input,
+    .contenido-seccion .formulario-inventario select {
+        padding: 8px 11px;
+    }
+
+    .contenido-seccion .formulario-inventario button,
+    .contenido-seccion .seccion-inventario button {
+        padding: 8px 16px;
+    }
+
+    .contenido-seccion .mensaje-exito,
+    .contenido-seccion .mensaje-error {
+        margin: 10px 0 0;
+        padding: 7px 12px;
+    }
+
+    /* Reportes: tarjetas más bajas */
+    .contenido-seccion .resumen-reportes {
+        flex-shrink: 0;
+        margin: 0;
+        gap: 14px;
+    }
+
+    .contenido-seccion .tarjeta-reporte {
+        padding: 12px 16px;
+    }
+
+    .contenido-seccion .tarjeta-reporte h3 {
+        margin-bottom: 6px;
+        padding-bottom: 6px;
+        font-size: 12px;
+    }
+
+    .contenido-seccion .tarjeta-reporte p {
+        font-size: 22px;
+    }
+
+    /* Inicio: todo en una sola pantalla */
+    .contenido-dashboard {
+        height: 100vh;
+        padding: 18px 28px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .barra-superior {
+        flex-shrink: 0;
+        padding-bottom: 12px;
+    }
+
+    .barra-superior h1 {
+        font-size: 28px;
+    }
+
+    .bienvenida-panel {
+        flex-shrink: 0;
+        margin: 16px 0;
+        padding: 16px 26px;
+        border-width: 8px;
+    }
+
+    .bienvenida-panel h2 {
+        margin: 4px 0;
+        font-size: 25px;
+    }
+
+    .bienvenida-panel p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .ilustracion-bienvenida {
+        width: 76px;
+        height: 76px;
+        font-size: 40px;
+    }
+
+    .seccion-accesos {
+        margin-top: 0;
+    }
+
+    .titulo-seccion-dashboard {
+        margin-bottom: 12px;
+    }
+
+    .titulo-seccion-dashboard h2 {
+        font-size: 21px;
+    }
+
+    .titulo-seccion-dashboard p {
+        margin-top: 2px;
+    }
+
+    /* Tarjetas en 2 y 2, con el ícono a la izquierda para que sean bajas */
+    .tarjetas-dashboard {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .tarjeta-dashboard {
+        padding: 14px 18px;
+        display: grid;
+        grid-template-columns: 50px minmax(0, 1fr);
+        column-gap: 16px;
+        align-items: start;
+    }
+
+    .icono-tarjeta {
+        grid-row: 1 / span 4;
+        width: 50px;
+        height: 50px;
+        margin-bottom: 0;
+        font-size: 24px;
+    }
+
+    .tarjeta-dashboard h3 {
+        margin: 0 0 2px;
+        font-size: 20px;
+    }
+
+    .tarjeta-dashboard p {
+        min-height: 0;
+        margin-bottom: 10px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .tarjeta-dashboard a {
+        justify-self: start;
+        padding: 6px 13px;
+    }
+
+    .footer-dashboard {
+        margin-top: 16px;
+        padding-top: 10px;
+    }
+
+    /* Las tarjetas se estiran hasta la línea de puntos del pie */
+    .seccion-accesos {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tarjetas-dashboard {
+        flex: 1;
+        min-height: 0;
+        grid-template-rows: repeat(2, minmax(0, 1fr));
+    }
+
+    .tarjeta-dashboard {
+        grid-template-columns: 64px minmax(0, 1fr);
+        column-gap: 20px;
+        align-content: center;
+        padding: 18px 24px;
+    }
+
+    .icono-tarjeta {
+        width: 64px;
+        height: 64px;
+        font-size: 30px;
+    }
+
+    .tarjeta-dashboard h3 {
+        font-size: 24px;
+    }
+
+    .tarjeta-dashboard p {
+        font-size: 14px;
+    }
+}
+
+/* Login y registro: más compactos en pantallas bajas */
+@media (max-height: 800px) {
+    .pagina-auth {
+        padding: 16px;
+    }
+
+    .tarjeta-auth {
+        padding: 60px 30px 22px;
+    }
+
+    .tarjeta-auth h1 {
+        font-size: 28px;
+    }
+
+    .tarjeta-auth > p {
+        margin-bottom: 6px;
+    }
+
+    .tarjeta-auth h2 {
+        margin: 10px 0 10px;
+        font-size: 20px;
+    }
+
+    .tarjeta-auth form {
+        gap: 8px;
+    }
+
+    .tarjeta-auth input {
+        padding: 9px 12px;
+    }
+
+    .tarjeta-auth form + p {
+        margin-top: 12px;
+    }
+}
+
+
+/* ==========================================
+   BUSCADOR DE LAS TABLAS
+========================================== */
+
+.encabezado-tabla {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    margin-bottom: 12px;
+}
+
+.seccion-inventario .encabezado-tabla h2 {
+    margin-bottom: 0;
+}
+
+.buscador {
+    flex: 0 1 380px;
+    min-width: 220px;
+    padding: 9px 14px 9px 38px;
+    border: 2px solid var(--tinta);
+    border-radius: 999px;
+    outline: none;
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b1d14' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E")
+            no-repeat 13px center / 17px,
+        white;
+    color: var(--texto);
+    box-shadow: var(--sombra-dura-chica);
+    transition: box-shadow 0.15s ease;
+}
+
+.buscador:focus {
+    box-shadow:
+        var(--sombra-dura-chica),
+        0 0 0 4px var(--amarillo-claro);
+}
+
+@media (min-width: 901px) {
+    .contenido-seccion .encabezado-tabla {
+        flex-shrink: 0;
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 600px) {
+    .buscador {
+        flex-basis: 100%;
+    }
+}
