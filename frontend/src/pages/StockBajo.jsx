@@ -1,57 +1,15 @@
 
-import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { solicitar } from "../services/api";
+import useFetch from "../hooks/useFetch";
 
 function StockBajo() {
-    const [productos, setProductos] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState("");
-
-    // Permite actualizar el inventario desde el botón.
-    const cargarStockBajo = useCallback(async () => {
-        setCargando(true);
-
-        try {
-            const datos = await solicitar("/productos/stock-bajo");
-            setProductos(datos);
-            setError("");
-        } catch (err) {
-            setError(err.message || "No se pudo cargar el inventario.");
-        } finally {
-            setCargando(false);
-        }
-    }, []);
-
-    // Consultamos los productos al abrir la página.
-    useEffect(() => {
-        let activo = true;
-
-        const obtenerStockBajo = async () => {
-            try {
-                const datos = await solicitar("/productos/stock-bajo");
-
-                if (activo) {
-                    setProductos(datos);
-                    setError("");
-                }
-            } catch (err) {
-                if (activo) {
-                    setError(err.message || "No se pudo cargar el inventario.");
-                }
-            } finally {
-                if (activo) {
-                    setCargando(false);
-                }
-            }
-        };
-
-        obtenerStockBajo();
-
-        return () => {
-            activo = false;
-        };
-    }, []);
+    // Pedimos solo los productos con stock bajo.
+    const {
+        datos: productos,
+        cargando,
+        error,
+        recargar: cargarStockBajo
+    } = useFetch("/productos/stock-bajo");
 
     return (
         <main className="pagina-inventario">

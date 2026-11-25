@@ -58,10 +58,12 @@ CREATE TABLE IF NOT EXISTS productos (
     id_categoria INT NOT NULL,
     id_usuario INT NOT NULL,
 
+    -- RESTRICT: no se puede borrar una categoría que todavía tiene
+    -- productos. Así evitamos perder productos sin querer.
     CONSTRAINT fk_productos_categorias_usuarios
         FOREIGN KEY (id_categoria, id_usuario)
         REFERENCES categorias(id_categoria, id_usuario)
-        ON DELETE CASCADE,
+        ON DELETE RESTRICT,
 
     CONSTRAINT fk_productos_usuarios
         FOREIGN KEY (id_usuario)
@@ -69,7 +71,7 @@ CREATE TABLE IF NOT EXISTS productos (
         ON DELETE CASCADE,
 
     CONSTRAINT chk_precio
-        CHECK (precio >= 0),
+        CHECK (precio > 0),
 
     CONSTRAINT chk_stock
         CHECK (stock >= 0),
@@ -79,32 +81,3 @@ CREATE TABLE IF NOT EXISTS productos (
 
     INDEX idx_productos_usuario (id_usuario)
 ) ENGINE=InnoDB;
-
--- ==================================================
--- 4. CONSULTAS PARA VERIFICAR LA BASE DE DATOS
--- ==================================================
-
-SELECT * FROM usuarios;
-SELECT * FROM categorias;
-SELECT * FROM productos;
-
--- Productos junto con sus categorías y usuarios.
-SELECT
-    p.id_producto,
-    p.nombre,
-    p.precio,
-    p.stock,
-    p.stock_minimo,
-    c.nombre AS categoria,
-    u.nombre AS usuario
-FROM productos p
-INNER JOIN categorias c
-    ON p.id_categoria = c.id_categoria
-   AND p.id_usuario = c.id_usuario
-INNER JOIN usuarios u
-    ON p.id_usuario = u.id_usuario;
-
--- Productos con stock bajo.
-SELECT *
-FROM productos
-WHERE stock <= stock_minimo;

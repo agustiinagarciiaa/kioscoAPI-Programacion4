@@ -1,4 +1,4 @@
-﻿
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContextBase";
@@ -42,8 +42,9 @@ function Login() {
                 <h2>Iniciar sesión</h2>
 
                 <form onSubmit={manejarLogin}>
-                    <label>Correo electrónico</label>
+                    <label htmlFor="email">Correo electrónico</label>
                     <input
+                        id="email"
                         type="email"
                         placeholder="Ingresá tu correo"
                         value={email}
@@ -52,8 +53,9 @@ function Login() {
                         required
                     />
 
-                    <label>Contraseña</label>
+                    <label htmlFor="password">Contraseña</label>
                     <input
+                        id="password"
                         type="password"
                         placeholder="Ingresá tu contraseña"
                         value={password}

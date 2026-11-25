@@ -5,24 +5,75 @@ const productoModel = require("../models/productoModel");
 // VALIDAR DATOS DEL PRODUCTO
 // ==========================================
 const validarProducto = (datos) => {
-    const { nombre, precio, stock, stock_minimo, id_categoria } = datos;
+    const {
+        nombre,
+        descripcion,
+        precio,
+        stock,
+        stock_minimo,
+        id_categoria
+    } = datos || {};
 
+    // Nombre: obligatorio y de hasta 150 caracteres (como en la tabla).
     if (typeof nombre !== "string" || !nombre.trim()) {
         return "El nombre del producto es obligatorio";
     }
 
-    if (precio === undefined || precio === "" || !Number.isFinite(Number(precio)) || Number(precio) < 0) {
-        return "El precio debe ser mayor o igual a cero";
+    if (nombre.trim().length > 150) {
+        return "El nombre no puede superar los 150 caracteres";
     }
 
-    if (stock === undefined || stock === "" || !Number.isInteger(Number(stock)) || Number(stock) < 0) {
+    // Descripción: opcional, pero si viene tiene que ser texto de hasta 255.
+    if (
+        descripcion !== undefined &&
+        descripcion !== null &&
+        typeof descripcion !== "string"
+    ) {
+        return "La descripción debe ser un texto";
+    }
+
+    if (descripcion && descripcion.trim().length > 255) {
+        return "La descripción no puede superar los 255 caracteres";
+    }
+
+    // Precio: mayor que cero (mismo criterio que el frontend y el CHECK de la tabla).
+    // DECIMAL(10,2) admite hasta 99.999.999,99.
+    if (
+        precio === undefined ||
+        precio === null ||
+        precio === "" ||
+        !Number.isFinite(Number(precio)) ||
+        Number(precio) <= 0
+    ) {
+        return "El precio debe ser mayor que cero";
+    }
+
+    if (Number(precio) > 99999999.99) {
+        return "El precio es demasiado alto";
+    }
+
+    // Stock y stock mínimo: enteros mayores o iguales a cero.
+    if (
+        stock === undefined ||
+        stock === null ||
+        stock === "" ||
+        !Number.isInteger(Number(stock)) ||
+        Number(stock) < 0
+    ) {
         return "El stock debe ser un entero mayor o igual a cero";
     }
 
-    if (stock_minimo === undefined || stock_minimo === "" || !Number.isInteger(Number(stock_minimo)) || Number(stock_minimo) < 0) {
+    if (
+        stock_minimo === undefined ||
+        stock_minimo === null ||
+        stock_minimo === "" ||
+        !Number.isInteger(Number(stock_minimo)) ||
+        Number(stock_minimo) < 0
+    ) {
         return "El stock mínimo debe ser un entero mayor o igual a cero";
     }
 
+    // Categoría: un ID entero positivo.
     if (!Number.isInteger(Number(id_categoria)) || Number(id_categoria) <= 0) {
         return "Debés seleccionar una categoría válida";
     }

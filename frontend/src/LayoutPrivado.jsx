@@ -1,5 +1,5 @@
-﻿
-import { Link, useNavigate } from "react-router-dom";
+
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContextBase";
 
 function LayoutPrivado({ children }) {
@@ -14,6 +14,11 @@ function LayoutPrivado({ children }) {
 
     const inicial = usuario?.nombre?.charAt(0).toUpperCase() || "U";
 
+    // NavLink nos dice si el enlace corresponde a la página actual
+    // (isActive) y así resaltamos la sección en la que estamos.
+    const claseEnlace = ({ isActive }) =>
+        isActive ? "enlace-menu activo" : "enlace-menu";
+
     return (
         <main className="layout-dashboard">
 
@@ -21,10 +26,10 @@ function LayoutPrivado({ children }) {
             <aside className="menu-lateral">
 
                 <div className="marca-dashboard">
-                    <div className="logo-dashboard">K</div>
+                    <img className="logo-dashboard" src="/favicon.svg" alt="Logo TuKiosco" />
 
                     <div>
-                        <h2>KioscoAPI</h2>
+                        <h2>TuKiosco</h2>
                         <span>Gestión de inventario</span>
                     </div>
                 </div>
@@ -35,30 +40,30 @@ function LayoutPrivado({ children }) {
 
                 <nav className="navegacion-dashboard">
 
-                    <Link to="/dashboard" className="enlace-menu">
-                        <span className="icono-menu">⌂</span>
+                    <NavLink to="/dashboard" className={claseEnlace}>
+                        <span className="icono-menu">🏪</span>
                         Inicio
-                    </Link>
+                    </NavLink>
 
-                    <Link to="/productos" className="enlace-menu">
-                        <span className="icono-menu">▦</span>
+                    <NavLink to="/productos" className={claseEnlace}>
+                        <span className="icono-menu">🍫</span>
                         Productos
-                    </Link>
+                    </NavLink>
 
-                    <Link to="/categorias" className="enlace-menu">
-                        <span className="icono-menu">◇</span>
+                    <NavLink to="/categorias" className={claseEnlace}>
+                        <span className="icono-menu">🏷️</span>
                         Categorías
-                    </Link>
+                    </NavLink>
 
-                    <Link to="/stock-bajo" className="enlace-menu">
-                        <span className="icono-menu">◷</span>
+                    <NavLink to="/stock-bajo" className={claseEnlace}>
+                        <span className="icono-menu">📦</span>
                         Stock bajo
-                    </Link>
+                    </NavLink>
 
-                    <Link to="/reportes" className="enlace-menu">
-                        <span className="icono-menu">▤</span>
+                    <NavLink to="/reportes" className={claseEnlace}>
+                        <span className="icono-menu">🧾</span>
                         Reportes
-                    </Link>
+                    </NavLink>
 
                 </nav>
 
@@ -76,6 +81,7 @@ function LayoutPrivado({ children }) {
                     </div>
 
                     <button
+                        type="button"
                         className="boton-cerrar-sesion"
                         onClick={cerrarSesion}
                     >

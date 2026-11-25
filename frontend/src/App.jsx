@@ -21,7 +21,8 @@ import LayoutPrivado from "./LayoutPrivado";
 
 import "./App.css";
 
-// Protegemos las páginas privadas.
+// Protegemos las páginas privadas:
+// si no hay sesión, mandamos al usuario al login.
 function RutaPrivada({ children }) {
     const { usuario } = useAuth();
 
@@ -50,14 +51,20 @@ function ContenidoApp() {
 
             <Route
                 path="/registro"
-                element={<Registro />}
+                element={
+                    usuario
+                        ? <Navigate to="/dashboard" replace />
+                        : <Registro />
+                }
             />
 
             <Route
                 path="/dashboard"
                 element={
                     <RutaPrivada>
-                        <Dashboard />
+                        <LayoutPrivado>
+                            <Dashboard />
+                        </LayoutPrivado>
                     </RutaPrivada>
                 }
             />

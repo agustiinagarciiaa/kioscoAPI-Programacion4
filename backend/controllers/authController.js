@@ -30,10 +30,28 @@ const registrar = (req, res) => {
         });
     }
 
-    // Comprobamos que el nombre no esté vacío.
-    if (!nombre.trim()) {
+    // Comprobamos que los datos sean textos (evita errores 500
+    // si alguien manda, por ejemplo, un número en vez de un texto).
+    if (
+        typeof nombre !== "string" ||
+        typeof email !== "string" ||
+        typeof password !== "string"
+    ) {
         return res.status(400).json({
-            mensaje: "El nombre no puede estar vacío"
+            mensaje: "Los datos enviados no tienen el formato correcto"
+        });
+    }
+
+    // Comprobamos el largo del nombre (mismas reglas que el frontend).
+    if (nombre.trim().length < 3) {
+        return res.status(400).json({
+            mensaje: "El nombre debe tener al menos 3 caracteres"
+        });
+    }
+
+    if (nombre.trim().length > 100) {
+        return res.status(400).json({
+            mensaje: "El nombre no puede superar los 100 caracteres"
         });
     }
 
@@ -43,7 +61,7 @@ const registrar = (req, res) => {
     // Comprobamos que el correo tenga un formato válido.
     const formatoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!formatoEmail.test(emailNormalizado)) {
+    if (!formatoEmail.test(emailNormalizado) || emailNormalizado.length > 150) {
         return res.status(400).json({
             mensaje: "El correo electrónico no es válido"
         });
@@ -125,6 +143,13 @@ const login = (req, res) => {
     if (!email || !password) {
         return res.status(400).json({
             mensaje: "El correo y la contraseña son obligatorios"
+        });
+    }
+
+    // Comprobamos que sean textos.
+    if (typeof email !== "string" || typeof password !== "string") {
+        return res.status(400).json({
+            mensaje: "Los datos enviados no tienen el formato correcto"
         });
     }
 

@@ -1,8 +1,9 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { solicitar } from "../services/api";
 import useProductos from "../hooks/useProductos";
+import useFetch from "../hooks/useFetch";
 
 function Productos() {
     const {
@@ -13,7 +14,13 @@ function Productos() {
         setError
     } = useProductos();
 
-    const [categorias, setCategorias] = useState([]);
+    // Las categorías se usan para llenar el <select> del formulario.
+    const {
+        datos: categorias,
+        cargando: cargandoCategorias,
+        error: errorCategorias
+    } = useFetch("/categorias");
+
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [precio, setPrecio] = useState("");
@@ -23,37 +30,8 @@ function Productos() {
     const [idEditar, setIdEditar] = useState(null);
     const [mensaje, setMensaje] = useState("");
     const [guardando, setGuardando] = useState(false);
-    const [cargandoCategorias, setCargandoCategorias] = useState(true);
 
     // Cargar categorías al abrir la página.
-    useEffect(() => {
-        let activo = true;
-
-        const obtenerCategorias = async () => {
-            try {
-                const datos = await solicitar("/categorias");
-
-                if (activo) {
-                    setCategorias(datos);
-                }
-            } catch (err) {
-                if (activo) {
-                    setError(err.message);
-                }
-            } finally {
-                if (activo) {
-                    setCargandoCategorias(false);
-                }
-            }
-        };
-
-        obtenerCategorias();
-
-        return () => {
-            activo = false;
-        };
-    }, [setError]);
-
     const limpiarFormulario = () => {
         setNombre("");
         setDescripcion("");
@@ -69,16 +47,32 @@ function Productos() {
             return "El nombre del producto es obligatorio.";
         }
 
+        if (nombre.trim().length > 150) {
+            return "El nombre no puede superar los 150 caracteres.";
+        }
+
+        if (descripcion.trim().length > 255) {
+            return "La descripción no puede superar los 255 caracteres.";
+        }
+
         if (precio === "" || Number(precio) <= 0) {
             return "El precio debe ser mayor que cero.";
         }
 
-        if (stock === "" || Number(stock) < 0) {
-            return "El stock no puede ser negativo.";
+        if (Number(precio) > 99999999.99) {
+            return "El precio es demasiado alto.";
         }
 
-        if (stockMinimo === "" || Number(stockMinimo) < 0) {
-            return "El stock mínimo no puede ser negativo.";
+        if (stock === "" || !Number.isInteger(Number(stock)) || Number(stock) < 0) {
+            return "El stock debe ser un número entero mayor o igual a cero.";
+        }
+
+        if (
+            stockMinimo === "" ||
+            !Number.isInteger(Number(stockMinimo)) ||
+            Number(stockMinimo) < 0
+        ) {
+            return "El stock mínimo debe ser un número entero mayor o igual a cero.";
         }
 
         if (!idCategoria) {
@@ -94,6 +88,7 @@ function Productos() {
         const mensajeValidacion = validarFormulario();
 
         if (mensajeValidacion) {
+            setMensaje("");
             setError(mensajeValidacion);
             return;
         }
@@ -129,7 +124,7 @@ function Productos() {
             }
 
             limpiarFormulario();
-            await cargarProductos();
+            cargarProductos();
         } catch (err) {
             setError(err.message);
         } finally {
@@ -141,7 +136,7 @@ function Productos() {
         setIdEditar(producto.id_producto);
         setNombre(producto.nombre);
         setDescripcion(producto.descripcion || "");
-        setPrecio(producto.precio);
+        setPrecio(String(producto.precio));
         setStock(String(producto.stock));
         setStockMinimo(String(producto.stock_minimo));
         setIdCategoria(String(producto.id_categoria));
@@ -163,7 +158,7 @@ function Productos() {
             });
 
             setMensaje("Producto eliminado correctamente.");
-            await cargarProductos();
+            cargarProductos();
         } catch (err) {
             setError(err.message);
         }
@@ -189,93 +184,114 @@ function Productos() {
                     className="formulario-inventario"
                     onSubmit={guardarProducto}
                 >
-                    <label htmlFor="nombre">Nombre</label>
-                    <input
-                        id="nombre"
-                        type="text"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
-                        required
-                    />
+                    {/* Cada campo agrupa su etiqueta y su input */}
+                    <div className="campo">
+                        <label htmlFor="nombre">Nombre</label>
+                        <input
+                            id="nombre"
+                            type="text"
+                            maxLength={150}
+                            value={nombre}
+                            onChange={(e) => setNombre(e.target.value)}
+                            required
+                        />
+                    </div>
 
-                    <label htmlFor="descripcion">Descripción</label>
-                    <input
-                        id="descripcion"
-                        type="text"
-                        value={descripcion}
-                        onChange={(e) => setDescripcion(e.target.value)}
-                    />
+                    <div className="campo">
+                        <label htmlFor="descripcion">Descripción</label>
+                        <input
+                            id="descripcion"
+                            type="text"
+                            maxLength={255}
+                            value={descripcion}
+                            onChange={(e) => setDescripcion(e.target.value)}
+                        />
+                    </div>
 
-                    <label htmlFor="precio">Precio</label>
-                    <input
-                        id="precio"
-                        type="number"
-                        min="0.01"
-                        step="0.01"
-                        value={precio}
-                        onChange={(e) => setPrecio(e.target.value)}
-                        required
-                    />
+                    <div className="campo">
+                        <label htmlFor="precio">Precio</label>
+                        <input
+                            id="precio"
+                            type="number"
+                            min="0.01"
+                            step="0.01"
+                            value={precio}
+                            onChange={(e) => setPrecio(e.target.value)}
+                            required
+                        />
+                    </div>
 
-                    <label htmlFor="stock">Stock actual</label>
-                    <input
-                        id="stock"
-                        type="number"
-                        min="0"
-                        step="1"
-                        value={stock}
-                        onChange={(e) => setStock(e.target.value)}
-                        required
-                    />
+                    <div className="campo">
+                        <label htmlFor="stock">Stock actual</label>
+                        <input
+                            id="stock"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={stock}
+                            onChange={(e) => setStock(e.target.value)}
+                            required
+                        />
+                    </div>
 
-                    <label htmlFor="stockMinimo">Stock mínimo</label>
-                    <input
-                        id="stockMinimo"
-                        type="number"
-                        min="0"
-                        step="1"
-                        value={stockMinimo}
-                        onChange={(e) => setStockMinimo(e.target.value)}
-                        required
-                    />
+                    <div className="campo">
+                        <label htmlFor="stockMinimo">Stock mínimo</label>
+                        <input
+                            id="stockMinimo"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={stockMinimo}
+                            onChange={(e) => setStockMinimo(e.target.value)}
+                            required
+                        />
+                    </div>
 
-                    <label htmlFor="categoria">Categoría</label>
-                    <select
-                        id="categoria"
-                        value={idCategoria}
-                        onChange={(e) => setIdCategoria(e.target.value)}
-                        required
-                    >
-                        <option value="">Seleccioná una categoría</option>
+                    <div className="campo">
+                        <label htmlFor="categoria">Categoría</label>
+                        <select
+                            id="categoria"
+                            value={idCategoria}
+                            onChange={(e) => setIdCategoria(e.target.value)}
+                            required
+                        >
+                            <option value="">Seleccioná una categoría</option>
 
-                        {categorias.map((categoria) => (
-                            <option
-                                key={categoria.id_categoria}
-                                value={categoria.id_categoria}
-                            >
-                                {categoria.nombre}
-                            </option>
-                        ))}
-                    </select>
+                            {categorias.map((categoria) => (
+                                <option
+                                    key={categoria.id_categoria}
+                                    value={categoria.id_categoria}
+                                >
+                                    {categoria.nombre}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <button
-                        type="submit"
-                        disabled={guardando || cargandoCategorias}
-                    >
-                        {guardando
-                            ? "Guardando..."
-                            : idEditar
-                                ? "Guardar cambios"
-                                : "Registrar producto"}
-                    </button>
-
-                    {idEditar && (
-                        <button type="button" onClick={limpiarFormulario}>
-                            Cancelar edición
+                    {/* Botones en una fila aparte */}
+                    <div className="acciones-formulario">
+                        <button
+                            type="submit"
+                            disabled={guardando || cargandoCategorias}
+                        >
+                            {guardando
+                                ? "Guardando..."
+                                : idEditar
+                                    ? "Guardar cambios"
+                                    : "Registrar producto"}
                         </button>
-                    )}
+
+                        {idEditar && (
+                            <button type="button" onClick={limpiarFormulario}>
+                                Cancelar edición
+                            </button>
+                        )}
+                    </div>
                 </form>
 
+                {errorCategorias && (
+                    <p className="mensaje-error">{errorCategorias}</p>
+                )}
                 {error && <p className="mensaje-error">{error}</p>}
                 {mensaje && <p className="mensaje-exito">{mensaje}</p>}
             </section>

@@ -45,6 +45,27 @@ app.use((req, res) => {
 });
 
 // ==========================================
+// MANEJO DE ERRORES INESPERADOS
+// ==========================================
+
+// Si llega un JSON mal escrito o falla algo que no controlamos,
+// respondemos siempre en JSON (y no con una página HTML de error).
+// eslint-disable-next-line no-unused-vars
+app.use((error, req, res, next) => {
+    if (error.type === "entity.parse.failed") {
+        return res.status(400).json({
+            mensaje: "El cuerpo de la solicitud no es un JSON válido"
+        });
+    }
+
+    console.error("Error inesperado:", error);
+
+    res.status(500).json({
+        mensaje: "Ocurrió un error inesperado en el servidor"
+    });
+});
+
+// ==========================================
 // INICIAR SERVIDOR
 // ==========================================
 

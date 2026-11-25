@@ -1,4 +1,4 @@
-﻿
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContextBase";
@@ -64,18 +64,21 @@ function Registro() {
                 <h2>Registro de usuario</h2>
 
                 <form onSubmit={manejarRegistro}>
-                    <label>Nombre completo</label>
+                    <label htmlFor="nombre">Nombre completo</label>
                     <input
+                        id="nombre"
                         type="text"
                         placeholder="Ingresá tu nombre"
                         value={nombre}
                         onChange={(e) => setNombre(e.target.value)}
                         autoComplete="name"
+                        maxLength={100}
                         required
                     />
 
-                    <label>Correo electrónico</label>
+                    <label htmlFor="email">Correo electrónico</label>
                     <input
+                        id="email"
                         type="email"
                         placeholder="Ingresá tu correo"
                         value={email}
@@ -84,8 +87,9 @@ function Registro() {
                         required
                     />
 
-                    <label>Contraseña</label>
+                    <label htmlFor="password">Contraseña</label>
                     <input
+                        id="password"
                         type="password"
                         placeholder="Mínimo 8 caracteres"
                         value={password}

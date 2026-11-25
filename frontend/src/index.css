@@ -1,23 +1,44 @@
 
 /* ==========================================
-   KIOSCO API - DISEÑO GENERAL
-   Azul grisáceo + lavanda
+   TUKIOSCO - DISEÑO GENERAL
+   Kiosco de barrio: toldo rojo y blanco,
+   cartel amarillo, pizarra y tickets de caja
 ========================================== */
 
 :root {
-    --azul-oscuro: #293449;
-    --azul-medio: #526581;
-    --azul-suave: #7185a8;
-    --lavanda: #a79bd8;
-    --lavanda-clara: #eeebf8;
-    --fondo: #f3f4f9;
-    --blanco: #ffffff;
-    --texto: #30394b;
-    --texto-secundario: #7c8495;
-    --borde: #e5e7ef;
-    --verde: #399b79;
-    --rojo: #d65b68;
-    --sombra: 0 5px 22px rgba(41, 52, 73, 0.07);
+    --rojo: #d62839;
+    --rojo-oscuro: #a51d2d;
+    --rojo-claro: #fde4e6;
+    --amarillo: #ffc845;
+    --amarillo-oscuro: #f0b020;
+    --amarillo-claro: #fff4cc;
+    --crema: #fbf3e4;
+    --papel: #fffdf8;
+    --tinta: #2b1d14;
+    --madera: #3a281c;
+    --texto: #3b2b20;
+    --texto-secundario: #7a6555;
+    --borde: #e6d3b5;
+    --verde: #2f9e6b;
+    --verde-claro: #e3f5ea;
+    --pizarra: var(--amarillo);
+    --fuente-cartel: "Lilita One", "Arial Black", Impact, sans-serif;
+    --fuente-texto: "Nunito", "Segoe UI", Arial, sans-serif;
+    --fuente-ticket: "Consolas", "Courier New", monospace;
+    --sombra-dura: 4px 4px 0 var(--tinta);
+    --sombra-dura-chica: 2px 2px 0 var(--tinta);
+
+    /* Toldo a rayas con el borde ondulado */
+    --toldo:
+        radial-gradient(circle at 14px 0, var(--rojo) 13px, transparent 14px)
+            0 30px / 56px 14px repeat-x,
+        radial-gradient(circle at 42px 0, #ffffff 13px, transparent 14px)
+            0 30px / 56px 14px repeat-x,
+        repeating-linear-gradient(
+            90deg,
+            var(--rojo) 0 28px,
+            #ffffff 28px 56px
+        ) 0 0 / 100% 30px no-repeat;
 }
 
 /* ==========================================
@@ -31,8 +52,10 @@
 }
 
 body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: var(--fondo);
+    font-family: var(--fuente-texto);
+    background-color: var(--crema);
+    background-image: radial-gradient(#ead9bd 1.2px, transparent 1.2px);
+    background-size: 20px 20px;
     color: var(--texto);
     line-height: 1.5;
 }
@@ -46,7 +69,6 @@ textarea {
 
 button {
     cursor: pointer;
-    transition: 0.2s ease;
 }
 
 a {
@@ -55,7 +77,10 @@ a {
 }
 
 h1, h2, h3 {
-    color: var(--azul-oscuro);
+    color: var(--tinta);
+    font-family: var(--fuente-cartel);
+    font-weight: 400;
+    letter-spacing: 0.3px;
 }
 
 
@@ -69,101 +94,102 @@ h1, h2, h3 {
     justify-content: center;
     align-items: center;
     padding: 25px;
-    background:
-        radial-gradient(circle at top left, #e5e1f5, transparent 40%),
-        linear-gradient(135deg, #e9edf5, #f7f6fb);
+    background-color: var(--madera);
+    background-image:
+        radial-gradient(rgba(255, 200, 69, 0.12) 1.5px, transparent 1.5px);
+    background-size: 22px 22px;
 }
 
 .tarjeta-auth {
+    position: relative;
     width: 100%;
     max-width: 430px;
-    padding: 38px;
-    background: var(--blanco);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 22px;
-    box-shadow: 0 15px 45px rgba(41, 52, 73, 0.10);
+    padding: 72px 36px 34px;
+    overflow: hidden;
+    background: var(--papel);
+    border: 3px solid var(--tinta);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--amarillo);
+}
+
+/* El toldo arriba de la tarjeta */
+.tarjeta-auth::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    background: var(--toldo);
+    border-bottom: none;
 }
 
 .tarjeta-auth h1 {
-    color: var(--azul-oscuro);
+    color: var(--rojo);
     text-align: center;
-    font-size: 29px;
-    margin-bottom: 8px;
+    font-size: 32px;
+    margin-bottom: 6px;
+    text-shadow: 2px 2px 0 var(--amarillo);
 }
 
 .tarjeta-auth h2 {
-    margin: 25px 0 20px;
-    font-size: 21px;
+    margin: 22px 0 18px;
+    font-size: 22px;
 }
 
 .tarjeta-auth > p {
     text-align: center;
     color: var(--texto-secundario);
-    margin-bottom: 18px;
+    margin-bottom: 14px;
 }
 
 .tarjeta-auth form {
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 12px;
 }
 
 .tarjeta-auth label {
-    font-weight: 600;
+    font-weight: 800;
     font-size: 14px;
-    color: var(--azul-oscuro);
+    color: var(--tinta);
 }
 
 .tarjeta-auth input {
     width: 100%;
-    padding: 13px 14px;
-    border: 1px solid var(--borde);
+    padding: 12px 14px;
+    border: 2px solid var(--borde);
     border-radius: 10px;
     outline: none;
-    background: #fafbfe;
+    background: white;
     color: var(--texto);
     transition: 0.2s ease;
 }
 
 .tarjeta-auth input:focus {
-    border-color: var(--lavanda);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(167, 155, 216, 0.15);
+    border-color: var(--rojo);
+    box-shadow: 0 0 0 4px var(--amarillo-claro);
 }
 
-.tarjeta-auth button,
-.encabezado-dashboard button {
-    padding: 13px 18px;
-    border: none;
-    border-radius: 10px;
-    background: var(--azul-oscuro);
-    color: white;
-    font-weight: 600;
-}
-
-.tarjeta-auth button:hover,
-.encabezado-dashboard button:hover {
-    background: var(--azul-medio);
-    transform: translateY(-1px);
+.tarjeta-auth button {
+    margin-top: 6px;
 }
 
 .tarjeta-auth a {
-    color: #8173b7;
-    font-weight: 600;
+    color: var(--rojo);
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-color: var(--amarillo);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 3px;
 }
 
 .tarjeta-auth a:hover {
-    color: var(--azul-oscuro);
+    color: var(--rojo-oscuro);
 }
 
 .tarjeta-auth form + p {
     margin-top: 20px;
-}
-
-.mensaje-error {
-    color: var(--rojo);
-    font-size: 14px;
-    margin-top: 12px;
 }
 
 
@@ -178,31 +204,48 @@ h1, h2, h3 {
     padding: 32px;
 }
 
+/* Encabezado de cada sección: un cartel rojo de negocio */
 .encabezado-dashboard {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 20px;
-    padding: 25px 28px;
-    background: var(--blanco);
-    border: 1px solid var(--borde);
-    border-radius: 17px;
-    box-shadow: var(--sombra);
+    padding: 24px 28px;
+    background: var(--rojo);
+    border: 3px solid var(--tinta);
+    border-radius: 16px;
+    box-shadow: var(--sombra-dura);
 }
 
 .encabezado-dashboard h1 {
-    color: var(--azul-oscuro);
-    font-size: 27px;
-    font-weight: 700;
+    color: white;
+    font-size: 30px;
+    text-shadow: 3px 3px 0 var(--rojo-oscuro);
 }
 
 .encabezado-dashboard p {
-    color: var(--texto-secundario);
-    margin-top: 5px;
+    color: var(--amarillo-claro);
+    margin-top: 4px;
+    font-weight: 600;
 }
 
-.encabezado-dashboard button {
-    padding: 11px 20px;
+/* El enlace "Volver al inicio" parece un botón */
+.encabezado-dashboard > a {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    border: 2px solid var(--tinta);
+    border-radius: 999px;
+    background: var(--amarillo);
+    color: var(--tinta);
+    font-weight: 800;
+    font-size: 14px;
+    box-shadow: var(--sombra-dura-chica);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.encabezado-dashboard > a:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--tinta);
 }
 
 .bienvenida,
@@ -221,39 +264,6 @@ h1, h2, h3 {
     color: var(--texto-secundario);
 }
 
-.tarjetas-dashboard {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 22px;
-}
-
-.tarjeta-dashboard {
-    position: relative;
-    background: var(--blanco);
-    padding: 26px;
-    border: 1px solid var(--borde);
-    border-radius: 17px;
-    box-shadow: var(--sombra);
-    transition: 0.25s ease;
-}
-
-.tarjeta-dashboard:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(41, 52, 73, 0.11);
-    border-color: #d7d0ed;
-}
-
-.tarjeta-dashboard h3 {
-    color: var(--azul-oscuro);
-    margin-bottom: 12px;
-    font-size: 19px;
-}
-
-.tarjeta-dashboard p {
-    color: var(--texto-secundario);
-    line-height: 1.6;
-}
-
 
 /* ==========================================
    SECCIONES DE INVENTARIO
@@ -261,42 +271,64 @@ h1, h2, h3 {
 
 .seccion-inventario {
     margin-top: 25px;
-    padding: 25px;
-    background: var(--blanco);
-    border: 1px solid var(--borde);
-    border-radius: 17px;
-    box-shadow: var(--sombra);
+    padding: 26px;
+    background: var(--papel);
+    border: 2px solid var(--tinta);
+    border-radius: 16px;
+    box-shadow: var(--sombra-dura);
 }
 
+/* Títulos con un trazo de resaltador amarillo */
 .seccion-inventario h2,
 .seccion-inventario h3 {
-    margin-bottom: 18px;
-    color: var(--azul-oscuro);
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 0 4px;
+    color: var(--tinta);
+    font-size: 22px;
+    background: linear-gradient(transparent 58%, var(--amarillo) 58%);
 }
 
 .formulario-inventario {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px 20px;
     margin-bottom: 25px;
+}
+
+/* Cada campo agrupa su etiqueta y su input en una sola celda */
+.formulario-inventario .campo {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Los botones van en una fila aparte debajo de los campos */
+.formulario-inventario .acciones-formulario {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .formulario-inventario label {
     display: block;
     margin-bottom: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--azul-oscuro);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--texto-secundario);
 }
 
 .formulario-inventario input,
 .formulario-inventario select,
 .formulario-inventario textarea {
     width: 100%;
-    padding: 12px 13px;
-    border: 1px solid var(--borde);
+    padding: 11px 13px;
+    border: 2px solid var(--borde);
     border-radius: 10px;
-    background: #fafbfe;
+    background: white;
     color: var(--texto);
     outline: none;
     transition: 0.2s ease;
@@ -305,43 +337,56 @@ h1, h2, h3 {
 .formulario-inventario input:focus,
 .formulario-inventario select:focus,
 .formulario-inventario textarea:focus {
-    border-color: var(--lavanda);
-    box-shadow: 0 0 0 3px rgba(167, 155, 216, 0.14);
-    background: white;
-}
-
-.formulario-inventario button {
-    align-self: end;
+    border-color: var(--rojo);
+    box-shadow: 0 0 0 4px var(--amarillo-claro);
 }
 
 
 /* ==========================================
    BOTONES GENERALES
+   Amarillos con borde y sombra marcada,
+   como los carteles pintados a mano
 ========================================== */
 
-.formulario-inventario button,
-.seccion-inventario button,
-.pagina-inventario > button,
-button {
-    transition: background 0.2s ease, transform 0.2s ease;
-}
-
+.tarjeta-auth button,
 .formulario-inventario button,
 .seccion-inventario button,
 .pagina-inventario > button {
-    padding: 11px 17px;
-    border: none;
-    border-radius: 9px;
-    background: var(--azul-oscuro);
-    color: white;
-    font-weight: 600;
+    padding: 11px 18px;
+    border: 2px solid var(--tinta);
+    border-radius: 10px;
+    background: var(--amarillo);
+    color: var(--tinta);
+    font-weight: 800;
+    box-shadow: 3px 3px 0 var(--tinta);
+    transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background 0.2s ease;
 }
 
+.tarjeta-auth button:hover,
 .formulario-inventario button:hover,
 .seccion-inventario button:hover,
 .pagina-inventario > button:hover {
-    background: var(--azul-medio);
-    transform: translateY(-1px);
+    background: var(--amarillo-oscuro);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--tinta);
+}
+
+.tarjeta-auth button:active,
+.formulario-inventario button:active,
+.seccion-inventario button:active,
+.pagina-inventario > button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--tinta);
+}
+
+/* "Cancelar edición" es un botón secundario */
+.formulario-inventario .acciones-formulario button[type="button"] {
+    background: white;
+}
+
+.formulario-inventario .acciones-formulario button[type="button"]:hover {
+    background: var(--crema);
 }
 
 button:disabled {
@@ -353,15 +398,16 @@ button:disabled {
 
 /* ==========================================
    TABLAS
+   Como una lista de precios
 ========================================== */
 
 .tabla-contenedor {
     width: 100%;
     overflow-x: auto;
-    margin-top: 20px;
+    margin-top: 10px;
     background: white;
-    border: 1px solid var(--borde);
-    border-radius: 13px;
+    border: 2px solid var(--tinta);
+    border-radius: 12px;
 }
 
 table {
@@ -371,23 +417,29 @@ table {
 }
 
 thead {
-    background: #edf0f7;
+    background: var(--tinta);
 }
 
 th {
-    padding: 15px;
-    color: var(--azul-oscuro);
-    font-size: 13px;
-    font-weight: 700;
+    padding: 14px 15px;
+    color: var(--amarillo);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
     text-align: left;
     white-space: nowrap;
 }
 
 td {
-    padding: 14px 15px;
-    border-top: 1px solid var(--borde);
+    padding: 13px 15px;
+    border-top: 1px dashed var(--borde);
     color: var(--texto);
     font-size: 14px;
+}
+
+tbody tr:nth-child(even) {
+    background: #fdf8ee;
 }
 
 tbody tr {
@@ -395,31 +447,33 @@ tbody tr {
 }
 
 tbody tr:hover {
-    background: #f8f7fc;
+    background: var(--amarillo-claro);
 }
 
-td button {
-    padding: 8px 12px;
+.seccion-inventario td button {
+    padding: 6px 12px;
     margin: 2px;
-    border: none;
-    border-radius: 7px;
-    background: var(--lavanda-clara);
-    color: #62558f;
-    font-weight: 600;
+    border: 2px solid var(--tinta);
+    border-radius: 999px;
+    background: var(--amarillo-claro);
+    color: var(--tinta);
+    font-weight: 800;
     font-size: 12px;
+    box-shadow: var(--sombra-dura-chica);
 }
 
-td button:hover {
-    background: #ddd7f0;
+.seccion-inventario td button:hover {
+    background: var(--amarillo);
 }
 
-td button:last-child {
-    background: #fbeaec;
-    color: #bd5361;
+.seccion-inventario td button:last-child {
+    background: var(--rojo-claro);
+    color: var(--rojo-oscuro);
 }
 
-td button:last-child:hover {
-    background: #f5d7dc;
+.seccion-inventario td button:last-child:hover {
+    background: var(--rojo);
+    color: white;
 }
 
 
@@ -430,20 +484,29 @@ td button:last-child:hover {
 .mensaje-exito {
     margin: 15px 0;
     padding: 12px 15px;
-    border-radius: 9px;
-    background: #e8f5ef;
-    color: #287653;
+    border: 2px solid var(--verde);
+    border-radius: 10px;
+    background: var(--verde-claro);
+    color: #1f7650;
     font-size: 14px;
+    font-weight: 700;
 }
 
 .mensaje-error {
-    color: var(--rojo);
-    margin-top: 15px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-left: 5px solid var(--rojo);
+    border-radius: 8px;
+    background: var(--rojo-claro);
+    color: var(--rojo-oscuro);
+    font-size: 14px;
+    font-weight: 700;
 }
 
 
 /* ==========================================
    REPORTES
+   Cada dato es una etiqueta de precio
 ========================================== */
 
 .resumen-reportes {
@@ -454,29 +517,53 @@ td button:last-child:hover {
 }
 
 .tarjeta-reporte {
-    background: var(--blanco);
-    padding: 23px;
-    border: 1px solid var(--borde);
-    border-radius: 16px;
-    box-shadow: var(--sombra);
-    transition: 0.2s ease;
+    position: relative;
+    background: var(--papel);
+    padding: 22px 22px 20px;
+    border: 2px solid var(--tinta);
+    border-radius: 6px 22px 6px 6px;
+    box-shadow: var(--sombra-dura);
+    transition: transform 0.2s ease;
 }
 
-.tarjeta-reporte:hover {
-    transform: translateY(-3px);
+/* El agujerito de la etiqueta */
+.tarjeta-reporte::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--tinta);
+    border-radius: 50%;
+    background: var(--crema);
+}
+
+.tarjeta-reporte:nth-child(odd):hover {
+    transform: rotate(-1.5deg) translateY(-3px);
+}
+
+.tarjeta-reporte:nth-child(even):hover {
+    transform: rotate(1.5deg) translateY(-3px);
 }
 
 .tarjeta-reporte h3 {
-    color: var(--azul-medio);
-    font-size: 14px;
-    font-weight: 600;
+    padding-bottom: 10px;
     margin-bottom: 12px;
+    border-bottom: 2px dashed var(--borde);
+    color: var(--texto-secundario);
+    font-family: var(--fuente-texto);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
 }
 
 .tarjeta-reporte p {
+    font-family: var(--fuente-ticket);
     font-size: 26px;
     font-weight: 700;
-    color: var(--azul-oscuro);
+    color: var(--rojo);
     overflow-wrap: anywhere;
 }
 
@@ -487,22 +574,19 @@ td button:last-child:hover {
 
 .estado-stock {
     display: inline-block;
-    padding: 5px 10px;
-    border-radius: 20px;
-    background: #fff0e8;
-    color: #bb7047;
+    padding: 4px 10px;
+    border: 2px solid var(--tinta);
+    border-radius: 999px;
+    background: var(--amarillo);
+    color: var(--tinta);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 
 /* ==========================================
    ENLACES Y EFECTOS
 ========================================== */
-
-a:hover {
-    transition: 0.2s ease;
-}
 
 input,
 select,
@@ -511,14 +595,21 @@ textarea {
 }
 
 ::selection {
-    background: #dcd5f1;
-    color: var(--azul-oscuro);
+    background: var(--amarillo);
+    color: var(--tinta);
 }
 
 
 /* ==========================================
    DISEÑO RESPONSIVE
 ========================================== */
+
+/* En pantallas medianas el formulario pasa a 2 columnas */
+@media (max-width: 1000px) {
+    .formulario-inventario {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
 @media (max-width: 900px) {
     .resumen-reportes {
@@ -546,11 +637,11 @@ textarea {
     }
 
     .encabezado-dashboard h1 {
-        font-size: 23px;
+        font-size: 24px;
     }
 
     .tarjeta-auth {
-        padding: 25px;
+        padding: 66px 22px 25px;
     }
 
     .resumen-reportes {
@@ -568,63 +659,86 @@ textarea {
 
 
 /* ==========================================
-   DASHBOARD MODERNO
+   DASHBOARD
 ========================================== */
 
 .layout-dashboard {
     min-height: 100vh;
     display: grid;
     grid-template-columns: 255px minmax(0, 1fr);
-    background: #f3f4f9;
 }
 
-/* MENÚ LATERAL */
+/* MENÚ LATERAL: el mostrador de madera con el toldo arriba */
 
 .menu-lateral {
+    position: relative;
     min-height: 100vh;
-    padding: 27px 18px;
+    padding: 70px 18px 24px;
     display: flex;
     flex-direction: column;
-    background: #293449;
+    background-color: var(--madera);
+    background-image: repeating-linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.025) 0 2px,
+        transparent 2px 9px
+    );
+    border-right: 3px solid var(--tinta);
     color: white;
 }
 
+.menu-lateral::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    background: var(--toldo);
+}
+
+/* Cartel luminoso con el nombre del negocio */
 .marca-dashboard {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0 10px 30px;
+    margin: 0 4px 22px;
+    padding: 12px;
+    border: 2px solid var(--amarillo);
+    border-radius: 12px;
+    background: var(--tinta);
+    box-shadow:
+        0 0 0 3px var(--tinta),
+        0 0 18px rgba(255, 200, 69, 0.35);
 }
 
 .logo-dashboard {
-    width: 43px;
-    height: 43px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 13px;
-    background: #a79bd8;
-    color: #293449;
-    font-size: 23px;
-    font-weight: 800;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: block;
+    border-radius: 11px;
+    box-shadow: 0 0 0 2px var(--tinta), 0 0 10px rgba(255, 200, 69, 0.45);
 }
 
 .marca-dashboard h2 {
-    color: white;
-    font-size: 19px;
+    color: var(--amarillo);
+    font-size: 22px;
+    line-height: 1.1;
+    text-shadow: 0 0 10px rgba(255, 200, 69, 0.6);
 }
 
 .marca-dashboard span {
-    color: #b7c0d0;
+    color: #d8c7b1;
     font-size: 11px;
+    font-weight: 600;
 }
 
 .menu-separador {
-    padding: 18px 10px 12px;
-    color: #9ba8bc;
+    padding: 10px 10px 10px;
+    color: #b39d86;
     font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
 }
 
 .navegacion-dashboard {
@@ -636,28 +750,32 @@ textarea {
 .enlace-menu {
     display: flex;
     align-items: center;
-    gap: 13px;
-    padding: 13px 14px;
+    gap: 12px;
+    padding: 11px 14px;
+    border: 2px solid transparent;
     border-radius: 10px;
-    color: #d2d9e5;
+    color: #f1e6d6;
     font-size: 14px;
-    transition: 0.2s ease;
+    font-weight: 700;
+    transition: 0.15s ease;
 }
 
-.enlace-menu:hover,
-.enlace-menu.activo {
-    background: #3d4962;
-    color: white;
+.enlace-menu:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 200, 69, 0.35);
 }
 
 .enlace-menu.activo {
-    box-shadow: inset 3px 0 #a79bd8;
+    background: var(--amarillo);
+    border-color: var(--tinta);
+    color: var(--tinta);
+    box-shadow: 3px 3px 0 var(--rojo);
 }
 
 .icono-menu {
-    width: 22px;
+    width: 24px;
     text-align: center;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 /* USUARIO Y CIERRE DE SESIÓN */
@@ -672,19 +790,22 @@ textarea {
     align-items: center;
     gap: 11px;
     padding: 15px 8px;
-    border-top: 1px solid #465168;
+    border-top: 2px dashed #5a4636;
 }
 
 .avatar-usuario {
     width: 38px;
     height: 38px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px solid var(--amarillo);
     border-radius: 50%;
-    background: #a79bd8;
-    color: #293449;
-    font-weight: 800;
+    background: var(--rojo);
+    color: white;
+    font-family: var(--fuente-cartel);
+    font-size: 18px;
 }
 
 .datos-usuario {
@@ -700,25 +821,29 @@ textarea {
 }
 
 .datos-usuario span {
-    color: #aeb9ca;
+    color: #b39d86;
     font-size: 11px;
 }
 
 .boton-cerrar-sesion {
     width: 100%;
-    padding: 12px;
+    padding: 11px 12px;
     display: flex;
     align-items: center;
     gap: 10px;
-    border: 1px solid #526079;
-    border-radius: 9px;
+    border: 2px solid #6b5442;
+    border-radius: 10px;
     background: transparent;
-    color: #e0e5ed;
+    color: #f1e6d6;
     font-size: 13px;
+    font-weight: 700;
+    transition: 0.15s ease;
 }
 
 .boton-cerrar-sesion:hover {
-    background: #3d4962;
+    background: var(--rojo);
+    border-color: var(--rojo);
+    color: white;
 }
 
 /* CONTENIDO */
@@ -733,43 +858,60 @@ textarea {
     justify-content: space-between;
     align-items: center;
     gap: 15px;
-    padding-bottom: 25px;
-    border-bottom: 1px solid #e3e6ef;
+    padding-bottom: 22px;
+    border-bottom: 3px dashed var(--borde);
 }
 
 .subtitulo-dashboard {
-    color: #8b83b8;
-    font-size: 10px;
+    color: var(--rojo);
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 1.3px;
+    letter-spacing: 1.4px;
 }
 
 .barra-superior h1 {
-    margin-top: 4px;
-    font-size: 27px;
+    margin-top: 2px;
+    font-size: 34px;
 }
 
+/* Cartelito de neón "abierto" */
 .etiqueta-sistema {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 13px;
-    border: 1px solid #dcebe4;
-    border-radius: 20px;
-    background: #edf7f1;
-    color: #438568;
+    gap: 9px;
+    padding: 8px 16px;
+    border: 2px solid var(--tinta);
+    border-radius: 999px;
+    background: var(--tinta);
+    color: #7dffb5;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(125, 255, 181, 0.7);
+    box-shadow: var(--sombra-dura-chica);
 }
 
 .punto-sistema {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
-    background: #55a982;
+    background: #7dffb5;
+    box-shadow: 0 0 8px #7dffb5;
+    animation: parpadeo 1.6s ease-in-out infinite;
 }
 
-/* BIENVENIDA */
+@keyframes parpadeo {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.35;
+    }
+}
+
+/* BIENVENIDA: la pizarra del kiosco */
 
 .bienvenida-panel {
     margin: 28px 0;
@@ -779,41 +921,48 @@ textarea {
     align-items: center;
     gap: 20px;
     overflow: hidden;
-    border-radius: 17px;
-    background: linear-gradient(115deg, #e4e8f3, #eeeaf8);
+    border: 10px solid #8b5a2b;
+    border-radius: 14px;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.06), transparent 45%),
+        var(--pizarra);
+    box-shadow:
+        inset 0 0 0 2px #6e4520,
+        var(--sombra-dura);
 }
 
 .etiqueta-bienvenida {
-    color: #8177b2;
-    font-size: 10px;
+    color: var(--rojo);
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.4px;
 }
 
 .bienvenida-panel h2 {
-    margin: 9px 0;
-    color: #293449;
-    font-size: 27px;
+    margin: 8px 0;
+    color: var(--tinta);
+    font-size: 30px;
+    text-shadow: 2px 2px 0 #ffffff;
 }
 
 .bienvenida-panel p {
     max-width: 560px;
-    color: #69758b;
-    font-size: 14px;
+    color: var(--texto);
+    font-size: 15px;
     line-height: 1.7;
 }
 
 .ilustracion-bienvenida {
-    width: 95px;
-    height: 95px;
+    width: 100px;
+    height: 100px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 25px;
-    background: rgba(167, 155, 216, 0.3);
-    color: #8177b2;
-    font-size: 50px;
+    border: 3px dashed rgba(43, 29, 20, 0.35);
+    border-radius: 50%;
+    font-size: 52px;
+    transform: rotate(-6deg);
 }
 
 /* SECCIÓN DE ACCESOS */
@@ -827,87 +976,106 @@ textarea {
 }
 
 .titulo-seccion-dashboard h2 {
-    font-size: 20px;
+    display: inline-block;
+    padding: 0 4px;
+    font-size: 24px;
+    background: linear-gradient(transparent 58%, var(--amarillo) 58%);
 }
 
 .titulo-seccion-dashboard p {
-    margin-top: 5px;
-    color: #858da0;
-    font-size: 13px;
+    margin-top: 6px;
+    color: var(--texto-secundario);
+    font-size: 14px;
 }
 
-/* TARJETAS */
+/* TARJETAS: como productos en la vidriera */
 
 .tarjetas-dashboard {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    gap: 22px;
 }
 
 .tarjeta-dashboard {
+    position: relative;
     min-width: 0;
     padding: 24px;
-    border: 1px solid #e5e7ef;
-    border-radius: 15px;
-    background: white;
-    box-shadow: 0 4px 16px rgba(41, 52, 73, 0.04);
-    transition: 0.25s ease;
+    border: 2px solid var(--tinta);
+    border-top-width: 10px;
+    border-radius: 14px;
+    background: var(--papel);
+    box-shadow: var(--sombra-dura);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-productos {
+    border-top-color: var(--rojo);
+}
+
+.tarjeta-categorias {
+    border-top-color: var(--amarillo-oscuro);
+}
+
+.tarjeta-stock {
+    border-top-color: #e8742a;
+}
+
+.tarjeta-reportes {
+    border-top-color: var(--verde);
 }
 
 .tarjeta-dashboard:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(41, 52, 73, 0.09);
+    transform: translate(-2px, -3px) rotate(-0.4deg);
+    box-shadow: 7px 7px 0 var(--tinta);
 }
 
 .icono-tarjeta {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 18px;
-    border-radius: 13px;
+    margin-bottom: 16px;
+    border: 2px solid var(--tinta);
+    border-radius: 50%;
     font-size: 24px;
+    box-shadow: var(--sombra-dura-chica);
 }
 
 .icono-azul {
-    background: #e6edf8;
-    color: #607da8;
+    background: var(--rojo-claro);
 }
 
 .icono-lavanda {
-    background: #eeebf8;
-    color: #8d80bd;
+    background: var(--amarillo-claro);
 }
 
 .icono-naranja {
-    background: #fbefe5;
-    color: #c58b60;
+    background: #ffe6d3;
 }
 
 .icono-verde {
-    background: #e8f3ed;
-    color: #5d9a7c;
+    background: var(--verde-claro);
 }
 
 .categoria-tarjeta {
-    color: #9299a8;
-    font-size: 9px;
+    color: var(--texto-secundario);
+    font-size: 10px;
     font-weight: 800;
-    letter-spacing: 1.1px;
+    letter-spacing: 1.3px;
 }
 
 .tarjeta-dashboard h3 {
-    margin: 7px 0;
-    color: #293449;
-    font-size: 19px;
+    margin: 4px 0 8px;
+    color: var(--tinta);
+    font-size: 22px;
 }
 
 .tarjeta-dashboard p {
     min-height: 48px;
     margin-bottom: 18px;
-    color: #7d8799;
-    font-size: 13px;
+    color: var(--texto-secundario);
+    font-size: 14px;
     line-height: 1.6;
 }
 
@@ -915,28 +1083,38 @@ textarea {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #7770a8;
-    font-size: 12px;
-    font-weight: 700;
+    padding: 8px 14px;
+    border: 2px solid var(--tinta);
+    border-radius: 999px;
+    background: var(--amarillo);
+    color: var(--tinta);
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: var(--sombra-dura-chica);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .tarjeta-dashboard a:hover {
-    color: #293449;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--tinta);
 }
 
 .tarjeta-dashboard a span {
-    font-size: 17px;
+    font-size: 16px;
 }
 
-/* PIE DE PÁGINA */
+/* PIE DE PÁGINA: como el final de un ticket */
 
 .footer-dashboard {
     margin-top: 45px;
-    padding-top: 20px;
-    border-top: 1px solid #e3e6ef;
-    color: #9ba2b0;
-    font-size: 11px;
+    padding-top: 18px;
+    border-top: 3px dashed var(--borde);
+    color: var(--texto-secundario);
+    font-family: var(--fuente-ticket);
+    font-size: 12px;
+    letter-spacing: 1px;
     text-align: center;
+    text-transform: uppercase;
 }
 
 /* RESPONSIVE */
@@ -962,11 +1140,13 @@ textarea {
 
     .menu-lateral {
         min-height: auto;
-        padding: 15px;
+        padding: 60px 15px 15px;
+        border-right: none;
+        border-bottom: 3px solid var(--tinta);
     }
 
     .marca-dashboard {
-        padding-bottom: 12px;
+        margin-bottom: 4px;
     }
 
     .menu-separador,
@@ -977,12 +1157,12 @@ textarea {
     .navegacion-dashboard {
         flex-direction: row;
         overflow-x: auto;
-        padding-top: 10px;
+        padding-top: 12px;
     }
 
     .enlace-menu {
         flex-shrink: 0;
-        padding: 10px;
+        padding: 9px 11px;
         font-size: 12px;
     }
 
@@ -991,11 +1171,12 @@ textarea {
     }
 
     .bienvenida-panel {
-        padding: 22px;
+        padding: 20px;
+        border-width: 7px;
     }
 
     .bienvenida-panel h2 {
-        font-size: 22px;
+        font-size: 23px;
     }
 
     .ilustracion-bienvenida {
@@ -1016,7 +1197,6 @@ textarea {
     min-width: 0;
     min-height: 100vh;
     overflow-x: auto;
-    background: #f3f4f9;
 }
 
 .contenido-seccion .pagina-inventario {

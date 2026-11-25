@@ -1,65 +1,21 @@
 
-import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { solicitar } from "../services/api";
+import useFetch from "../hooks/useFetch";
 
 function Reportes() {
-    const [productos, setProductos] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState("");
+    // Pedimos todos los productos y calculamos el resumen en el navegador.
+    const {
+        datos: productos,
+        cargando,
+        error,
+        recargar: cargarReporte
+    } = useFetch("/productos");
 
-    // Formateamos los importes como pesos argentinos.
     const formatoDinero = new Intl.NumberFormat("es-AR", {
         style: "currency",
         currency: "ARS"
     });
 
-    // Actualizamos el reporte cuando el usuario lo solicita.
-    const cargarReporte = useCallback(async () => {
-        setCargando(true);
-
-        try {
-            const datos = await solicitar("/productos");
-            setProductos(datos);
-            setError("");
-        } catch (err) {
-            setError(err.message || "No se pudo cargar el reporte.");
-        } finally {
-            setCargando(false);
-        }
-    }, []);
-
-    // Cargamos los productos al entrar en la página.
-    useEffect(() => {
-        let activo = true;
-
-        const obtenerReporte = async () => {
-            try {
-                const datos = await solicitar("/productos");
-
-                if (activo) {
-                    setProductos(datos);
-                    setError("");
-                }
-            } catch (err) {
-                if (activo) {
-                    setError(err.message || "No se pudo cargar el reporte.");
-                }
-            } finally {
-                if (activo) {
-                    setCargando(false);
-                }
-            }
-        };
-
-        obtenerReporte();
-
-        return () => {
-            activo = false;
-        };
-    }, []);
-
-    // Calculamos la cantidad de productos diferentes.
     const totalProductos = productos.length;
 
     // Calculamos todas las unidades disponibles.

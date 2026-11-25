@@ -81,8 +81,8 @@ const registrar = (datos, idUsuario, callback) => {
     conexion.query(
         sql,
         [
-            datos.nombre,
-            datos.descripcion || "",
+            datos.nombre.trim(),
+            datos.descripcion ? datos.descripcion.trim() : "",
             Number(datos.precio),
             Number(datos.stock),
             Number(datos.stock_minimo),
@@ -119,8 +119,8 @@ const modificar = (id, datos, idUsuario, callback) => {
         [
             Number(datos.id_categoria),
             idUsuario,
-            datos.nombre,
-            datos.descripcion || "",
+            datos.nombre.trim(),
+            datos.descripcion ? datos.descripcion.trim() : "",
             Number(datos.precio),
             Number(datos.stock),
             Number(datos.stock_minimo),

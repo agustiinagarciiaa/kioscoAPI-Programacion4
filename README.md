@@ -45,15 +45,17 @@ kioscoAPI/
 │
 ├── backend/
 │   ├── config/
-│   │   └── database.js
+│   │   └── database.js            # Pool de conexiones a MySQL
 │   ├── controllers/
-│   │   ├── authController.js
+│   │   ├── authController.js      # Registro e inicio de sesión
 │   │   ├── categoriaController.js
 │   │   └── productoController.js
 │   ├── database/
-│   │   └── schema.sql
+│   │   ├── schema.sql             # Crea la base y las tablas
+│   │   ├── consultas.sql          # Consultas de prueba (opcional)
+│   │   └── migracion_restrict.sql # Solo para bases creadas con la versión vieja
 │   ├── middleware/
-│   │   └── authMiddleware.js
+│   │   └── authMiddleware.js      # Verifica el token JWT
 │   ├── models/
 │   │   ├── categoriaModel.js
 │   │   ├── productoModel.js
@@ -62,17 +64,20 @@ kioscoAPI/
 │   │   ├── authRoutes.js
 │   │   ├── categoriaRoutes.js
 │   │   └── productoRoutes.js
+│   ├── .env.example               # Modelo de variables de entorno
 │   ├── package.json
-│   └── server.js
+│   └── server.js                  # Punto de entrada de la API
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── context/
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── App.jsx
+│   │   ├── context/               # AuthContext (sesión)
+│   │   ├── hooks/                 # useFetch y useProductos (hooks propios)
+│   │   ├── pages/                 # Una página por ruta
+│   │   ├── services/              # api.js (comunicación con el backend)
+│   │   ├── App.jsx                # Rutas y protección de rutas
+│   │   ├── LayoutPrivado.jsx      # Menú lateral de las páginas privadas
 │   │   └── main.jsx
+│   ├── .env.example
 │   └── package.json
 │
 ├── .gitignore
@@ -81,75 +86,111 @@ kioscoAPI/
 
 ## Requisitos previos
 
-Para ejecutar el proyecto se necesita:
+- [Node.js](https://nodejs.org) versión 20 o superior (recomendado: la versión LTS).
+- MySQL 8 (o MariaDB / XAMPP).
+- Un gestor de base de datos, como DBeaver o MySQL Workbench (opcional: también se puede usar la consola).
+- Visual Studio Code (opcional).
 
-- Node.js.
-- MySQL.
-- Un gestor de base de datos, como DBeaver.
-- Visual Studio Code.
+## Variables de entorno
+
+### Backend (`backend/.env`)
+
+Copiar `backend/.env.example` como `backend/.env` y completar:
+
+| Variable | Para qué sirve | Ejemplo |
+|---|---|---|
+| `DB_HOST` | Dirección del servidor MySQL | `localhost` |
+| `DB_USER` | Usuario de MySQL | `root` |
+| `DB_PASSWORD` | Contraseña de ese usuario (vacía en XAMPP) | `mi_clave` |
+| `DB_NAME` | Nombre de la base | `inventario_kiosco` |
+| `DB_PORT` | Puerto de MySQL | `3306` |
+| `PORT` | Puerto donde corre la API | `3000` |
+| `JWT_SECRET` | Clave para firmar los tokens. Larga y secreta | `una_clave_larga_123` |
+
+### Frontend (`frontend/.env`, opcional)
+
+| Variable | Para qué sirve | Valor por defecto |
+|---|---|---|
+| `VITE_API_URL` | Dirección de la API | `http://localhost:3000/api` |
+
+> El archivo `.env` **no se sube al repositorio** (está en `.gitignore`). Solo se sube `.env.example`.
 
 ## Instalación
 
 ### 1. Obtener el proyecto
 
-Clonar o descargar el repositorio y abrir una terminal en la carpeta principal.
+Clonar o descargar el repositorio y abrir una terminal en la carpeta principal `kioscoAPI`.
 
-### 2. Configurar el backend
+### 2. Crear la base de datos
+
+Con MySQL encendido, importar `backend/database/schema.sql`:
+
+- **DBeaver / Workbench:** abrir el archivo y ejecutarlo completo (en DBeaver: *Ejecutar script*, `Alt + X`).
+- **Consola:**
+
+```bash
+mysql -u root -p < backend/database/schema.sql
+```
+
+El script crea la base `inventario_kiosco` con las tablas `usuarios`, `categorias` y `productos`.
+
+> **¿Ya tenían la base creada con la versión anterior?** Ejecuten `backend/database/migracion_restrict.sql`. Cambia la regla de borrado de categorías sin perder los datos.
+
+### 3. Configurar y ejecutar el backend
 
 ```bash
 cd backend
 npm install
 ```
 
-Crear un archivo `.env` dentro de la carpeta `backend` con las siguientes variables:
-
-```env
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=tu_contraseña
-DB_NAME=inventario_kiosco
-DB_PORT=3306
-JWT_SECRET=colocar_una_clave_secreta
-```
-
-Completar los valores según la configuración local de MySQL.
-
-### 3. Configurar la base de datos
-
-Abrir MySQL o DBeaver e importar el archivo:
-
-`backend/database/schema.sql`
-
-Este archivo contiene la estructura de la base de datos necesaria para trabajar con el sistema.
-
-### 4. Ejecutar el backend
-
-Desde la carpeta `backend`:
+Crear `backend/.env` a partir de `.env.example` (en Windows: `copy .env.example .env`; en Linux/Mac: `cp .env.example .env`) y completar los datos. Después:
 
 ```bash
-node server.js
+npm start
 ```
 
-El servidor estará disponible en:
+Tiene que aparecer:
 
-`http://localhost:3000`
+```text
+Servidor funcionando en http://localhost:3000
+Conexión a MySQL establecida correctamente
+```
 
-### 5. Configurar el frontend
+> Para desarrollo: `npm run dev` reinicia el servidor solo cada vez que se guarda un archivo.
 
-Abrir una segunda terminal y ejecutar:
+### 4. Configurar y ejecutar el frontend
+
+En **otra terminal** (el backend tiene que seguir encendido):
 
 ```bash
 cd frontend
 npm install
-```
-
-### 6. Ejecutar el frontend
-
-```bash
 npm run dev
 ```
 
-Vite mostrará la dirección local para abrir la aplicación en el navegador.
+Abrir la dirección que muestra Vite (normalmente `http://localhost:5173`).
+
+## Endpoints de la API
+
+Todas las rutas de categorías y productos requieren el encabezado `Authorization: Bearer <token>`.
+
+| Método | Ruta | Descripción | Respuestas |
+|---|---|---|---|
+| POST | `/api/auth/registro` | Crea un usuario | 201, 400, 409 |
+| POST | `/api/auth/login` | Inicia sesión y devuelve el token | 200, 400, 401 |
+| GET | `/api/categorias` | Lista las categorías del usuario | 200, 401 |
+| GET | `/api/categorias/:id` | Obtiene una categoría | 200, 400, 404 |
+| POST | `/api/categorias` | Crea una categoría | 201, 400, 409 |
+| PUT | `/api/categorias/:id` | Modifica una categoría | 200, 400, 404, 409 |
+| DELETE | `/api/categorias/:id` | Elimina una categoría (solo si no tiene productos) | 200, 404, 409 |
+| GET | `/api/productos` | Lista los productos del usuario | 200, 401 |
+| GET | `/api/productos/stock-bajo` | Productos con stock ≤ stock mínimo | 200, 401 |
+| GET | `/api/productos/:id` | Obtiene un producto | 200, 400, 404 |
+| POST | `/api/productos` | Crea un producto | 201, 400 |
+| PUT | `/api/productos/:id` | Modifica un producto | 200, 400, 404 |
+| DELETE | `/api/productos/:id` | Elimina un producto | 200, 400, 404 |
+
+**Códigos usados:** 200 OK · 201 creado · 400 datos inválidos · 401 sin sesión o token vencido · 404 no existe (o no es del usuario) · 409 conflicto (duplicado o categoría con productos) · 500 error del servidor.
 
 ## Arquitectura del backend
 
@@ -173,6 +214,11 @@ Contiene las siguientes tablas principales:
 
 Las tablas de productos y categorías se relacionan con los usuarios para mantener separados sus registros.
 
+- Un usuario tiene muchas categorías y muchos productos (1 a N).
+- Una categoría tiene muchos productos (1 a N).
+- Una categoría **no se puede eliminar si tiene productos** (`ON DELETE RESTRICT`).
+- La clave foránea compuesta `(id_categoria, id_usuario)` impide asignar a un producto la categoría de otro usuario.
+
 ## Seguridad
 
 - Contraseñas protegidas mediante bcryptjs.
@@ -181,37 +227,16 @@ Las tablas de productos y categorías se relacionan con los usuarios para manten
 - Validación de datos recibidos.
 - Consultas de productos y categorías filtradas por usuario.
 - Variables de configuración almacenadas en `.env`.
+- Si el token vence, el frontend cierra la sesión y vuelve al login.
 
 
 ## Comprobaciones del proyecto
 
-Para verificar el frontend:
-
 ```bash
 cd frontend
-npm run lint
-npm run build
+npm run lint    # revisa el código
+npm run build   # genera la versión de producción en frontend/dist
 ```
-
-Para iniciar el backend:
-
-```bash
-cd backend
-npm start
-```
-
-El backend debe mostrar un mensaje de inicio del servidor y confirmar la conexión con MySQL.
-
-## Ejecución de producción
-
-Para generar la versión de producción del frontend:
-
-```bash
-cd frontend
-npm run build
-```
-
-Los archivos compilados se generan en la carpeta `dist`.
 
 ## Autoría
 

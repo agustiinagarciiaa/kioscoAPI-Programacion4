@@ -1,57 +1,23 @@
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { solicitar } from "../services/api";
+import useFetch from "../hooks/useFetch";
 
 function Categorias() {
-    const [categorias, setCategorias] = useState([]);
+    // Pedimos las categorías con el hook genérico.
+    const {
+        datos: categorias,
+        cargando,
+        error,
+        setError,
+        recargar: cargarCategorias
+    } = useFetch("/categorias");
+
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [idEditar, setIdEditar] = useState(null);
-    const [error, setError] = useState("");
     const [mensaje, setMensaje] = useState("");
-    const [cargando, setCargando] = useState(true);
-
-    const cargarCategorias = useCallback(async () => {
-        try {
-            const datos = await solicitar("/categorias");
-            setCategorias(datos);
-            setError("");
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setCargando(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        let activo = true;
-
-        const obtenerCategorias = async () => {
-            try {
-                const datos = await solicitar("/categorias");
-
-                if (activo) {
-                    setCategorias(datos);
-                    setError("");
-                }
-            } catch (err) {
-                if (activo) {
-                    setError(err.message);
-                }
-            } finally {
-                if (activo) {
-                    setCargando(false);
-                }
-            }
-        };
-
-        obtenerCategorias();
-
-        return () => {
-            activo = false;
-        };
-    }, []);
 
     const limpiarFormulario = () => {
         setNombre("");
@@ -59,14 +25,42 @@ function Categorias() {
         setIdEditar(null);
     };
 
+    // Validamos el formulario con las mismas reglas que el backend.
+    const validarFormulario = () => {
+        if (!nombre.trim()) {
+            return "El nombre de la categoría es obligatorio.";
+        }
+
+        if (nombre.trim().length > 100) {
+            return "El nombre no puede superar los 100 caracteres.";
+        }
+
+        if (descripcion.trim().length > 255) {
+            return "La descripción no puede superar los 255 caracteres.";
+        }
+
+        return "";
+    };
+
     const guardarCategoria = async (e) => {
         e.preventDefault();
+
+        const mensajeValidacion = validarFormulario();
+
+        if (mensajeValidacion) {
+            setMensaje("");
+            setError(mensajeValidacion);
+            return;
+        }
 
         try {
             setError("");
             setMensaje("");
 
-            const datos = { nombre, descripcion };
+            const datos = {
+                nombre: nombre.trim(),
+                descripcion: descripcion.trim()
+            };
 
             if (idEditar) {
                 await solicitar(`/categorias/${idEditar}`, {
@@ -85,7 +79,7 @@ function Categorias() {
             }
 
             limpiarFormulario();
-            await cargarCategorias();
+            cargarCategorias();
         } catch (err) {
             setError(err.message);
         }
@@ -101,7 +95,7 @@ function Categorias() {
 
     const eliminarCategoria = async (id) => {
         const confirmar = window.confirm(
-            "¿Estás seguro de eliminar esta categoría?"
+            "¿Estás seguro de eliminar esta categoría?\n\nSolo se puede eliminar si no tiene productos."
         );
 
         if (!confirmar) return;
@@ -115,7 +109,7 @@ function Categorias() {
             });
 
             setMensaje("Categoría eliminada correctamente.");
-            await cargarCategorias();
+            cargarCategorias();
         } catch (err) {
             setError(err.message);
         }
@@ -141,34 +135,44 @@ function Categorias() {
                     className="formulario-inventario"
                     onSubmit={guardarCategoria}
                 >
-                    <label htmlFor="nombreCategoria">Nombre</label>
-                    <input
-                        id="nombreCategoria"
-                        type="text"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
-                        placeholder="Nombre de la categoría"
-                        required
-                    />
+                    {/* Cada campo agrupa su etiqueta y su input */}
+                    <div className="campo">
+                        <label htmlFor="nombreCategoria">Nombre</label>
+                        <input
+                            id="nombreCategoria"
+                            type="text"
+                            value={nombre}
+                            onChange={(e) => setNombre(e.target.value)}
+                            placeholder="Nombre de la categoría"
+                            maxLength={100}
+                            required
+                        />
+                    </div>
 
-                    <label htmlFor="descripcionCategoria">Descripción</label>
-                    <input
-                        id="descripcionCategoria"
-                        type="text"
-                        value={descripcion}
-                        onChange={(e) => setDescripcion(e.target.value)}
-                        placeholder="Descripción"
-                    />
+                    <div className="campo">
+                        <label htmlFor="descripcionCategoria">Descripción</label>
+                        <input
+                            id="descripcionCategoria"
+                            type="text"
+                            value={descripcion}
+                            onChange={(e) => setDescripcion(e.target.value)}
+                            placeholder="Descripción"
+                            maxLength={255}
+                        />
+                    </div>
 
-                    <button type="submit">
-                        {idEditar ? "Guardar cambios" : "Registrar categoría"}
-                    </button>
-
-                    {idEditar && (
-                        <button type="button" onClick={limpiarFormulario}>
-                            Cancelar edición
+                    {/* Botones en una fila aparte */}
+                    <div className="acciones-formulario">
+                        <button type="submit">
+                            {idEditar ? "Guardar cambios" : "Registrar categoría"}
                         </button>
-                    )}
+
+                        {idEditar && (
+                            <button type="button" onClick={limpiarFormulario}>
+                                Cancelar edición
+                            </button>
+                        )}
+                    </div>
                 </form>
 
                 {error && <p className="mensaje-error">{error}</p>}
