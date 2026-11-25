@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { solicitar } from "../services/api";
 import useFetch from "../hooks/useFetch";
 import { coincideBusqueda } from "../utils/buscar";
+import VentanaConfirmacion from "../components/VentanaConfirmacion";
 
 // Validamos los datos con las mismas reglas que el backend.
 const validarCategoria = (nombre, descripcion) => {
@@ -38,6 +39,10 @@ function Categorias() {
 
     // Texto del buscador de la tabla.
     const [busqueda, setBusqueda] = useState("");
+
+    // Categoría que se quiere eliminar (abre la ventana de confirmación).
+    const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
+    const [eliminando, setEliminando] = useState(false);
 
     // Categorías que coinciden con lo que se escribió en el buscador.
     const categoriasFiltradas = categorias.filter((categoria) =>
@@ -152,13 +157,8 @@ function Categorias() {
     };
 
     const eliminarCategoria = async (id) => {
-        const confirmar = window.confirm(
-            "¿Estás seguro de eliminar esta categoría?\n\nSolo se puede eliminar si no tiene productos."
-        );
-
-        if (!confirmar) return;
-
         try {
+            setEliminando(true);
             setError("");
             setMensaje("");
 
@@ -170,6 +170,9 @@ function Categorias() {
             cargarCategorias();
         } catch (err) {
             setError(err.message);
+        } finally {
+            setEliminando(false);
+            setCategoriaAEliminar(null);
         }
     };
 
@@ -270,9 +273,7 @@ function Categorias() {
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    eliminarCategoria(
-                                                        categoria.id_categoria
-                                                    )
+                                                    setCategoriaAEliminar(categoria)
                                                 }
                                             >
                                                 Eliminar
@@ -295,6 +296,23 @@ function Categorias() {
                     </div>
                 )}
             </section>
+
+            {/* VENTANA PARA CONFIRMAR LA ELIMINACIÓN */}
+            {categoriaAEliminar && (
+                <VentanaConfirmacion
+                    titulo="¿Eliminar categoría?"
+                    procesando={eliminando}
+                    onConfirmar={() =>
+                        eliminarCategoria(categoriaAEliminar.id_categoria)
+                    }
+                    onCancelar={() => setCategoriaAEliminar(null)}
+                >
+                    <p>
+                        Vas a eliminar <strong>{categoriaAEliminar.nombre}</strong>.
+                    </p>
+                    <p>Solo se puede eliminar si no tiene productos.</p>
+                </VentanaConfirmacion>
+            )}
 
             {/* VENTANA EMERGENTE PARA MODIFICAR UNA CATEGORÍA */}
             {categoriaEditando && (

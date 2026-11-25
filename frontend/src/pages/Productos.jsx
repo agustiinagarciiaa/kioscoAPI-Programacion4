@@ -4,6 +4,7 @@ import { solicitar } from "../services/api";
 import useProductos from "../hooks/useProductos";
 import useFetch from "../hooks/useFetch";
 import { coincideBusqueda } from "../utils/buscar";
+import VentanaConfirmacion from "../components/VentanaConfirmacion";
 
 // Valores iniciales del formulario de registro.
 const PRODUCTO_VACIO = {
@@ -185,6 +186,10 @@ function Productos() {
 
     // Texto del buscador de la tabla.
     const [busqueda, setBusqueda] = useState("");
+
+    // Producto que se quiere eliminar (abre la ventana de confirmación).
+    const [productoAEliminar, setProductoAEliminar] = useState(null);
+    const [eliminando, setEliminando] = useState(false);
     const [guardando, setGuardando] = useState(false);
 
     // Ventana de edición: null cuando está cerrada.
@@ -305,11 +310,8 @@ function Productos() {
     };
 
     const eliminarProducto = async (id) => {
-        if (!window.confirm("¿Estás seguro de eliminar este producto?")) {
-            return;
-        }
-
         try {
+            setEliminando(true);
             setError("");
             setMensaje("");
 
@@ -321,6 +323,9 @@ function Productos() {
             cargarProductos();
         } catch (err) {
             setError(err.message);
+        } finally {
+            setEliminando(false);
+            setProductoAEliminar(null);
         }
     };
 
@@ -427,7 +432,7 @@ function Productos() {
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    eliminarProducto(producto.id_producto)
+                                                    setProductoAEliminar(producto)
                                                 }
                                             >
                                                 Eliminar
@@ -440,6 +445,23 @@ function Productos() {
                     </div>
                 )}
             </section>
+
+            {/* VENTANA PARA CONFIRMAR LA ELIMINACIÓN */}
+            {productoAEliminar && (
+                <VentanaConfirmacion
+                    titulo="¿Eliminar producto?"
+                    procesando={eliminando}
+                    onConfirmar={() =>
+                        eliminarProducto(productoAEliminar.id_producto)
+                    }
+                    onCancelar={() => setProductoAEliminar(null)}
+                >
+                    <p>
+                        Vas a eliminar <strong>{productoAEliminar.nombre}</strong>.
+                    </p>
+                    <p>Esta acción no se puede deshacer.</p>
+                </VentanaConfirmacion>
+            )}
 
             {/* VENTANA EMERGENTE PARA MODIFICAR UN PRODUCTO */}
             {productoEditando && (

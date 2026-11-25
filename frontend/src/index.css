@@ -1769,3 +1769,105 @@ textarea {
         flex-basis: 100%;
     }
 }
+
+
+/* ==========================================
+   VENTANA DE CONFIRMACIÓN (ELIMINAR)
+========================================== */
+
+.modal-ventana.modal-confirmacion {
+    max-width: 400px;
+    padding: 64px 28px 24px;
+    text-align: center;
+}
+
+.icono-confirmacion {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    border: 3px solid var(--tinta);
+    border-radius: 50%;
+    background: var(--rojo);
+    color: white;
+    font-family: var(--fuente-cartel);
+    font-size: 30px;
+    box-shadow: var(--sombra-dura-chica);
+}
+
+.modal-confirmacion h2 {
+    margin-bottom: 10px;
+}
+
+.texto-confirmacion p {
+    color: var(--texto-secundario);
+    font-size: 15px;
+}
+
+.texto-confirmacion strong {
+    color: var(--tinta);
+}
+
+.acciones-confirmacion {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.acciones-confirmacion button {
+    padding: 10px 20px;
+    border: 2px solid var(--tinta);
+    border-radius: 10px;
+    font-weight: 800;
+    box-shadow: 3px 3px 0 var(--tinta);
+    transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background 0.2s ease;
+}
+
+.acciones-confirmacion button:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--tinta);
+}
+
+.acciones-confirmacion button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--tinta);
+}
+
+.boton-cancelar {
+    background: white;
+    color: var(--tinta);
+}
+
+.boton-cancelar:hover {
+    background: var(--crema);
+}
+
+.boton-peligro {
+    background: var(--rojo);
+    color: white;
+}
+
+.boton-peligro:hover {
+    background: var(--rojo-oscuro);
+}
+
+
+/* ==========================================
+   FILAS DE LAS TABLAS DEL MISMO ALTO
+   Productos y Categorías: los botones de acciones
+   quedan siempre en una línea y todas las filas miden igual.
+========================================== */
+
+.seccion-inventario td {
+    height: 46px;
+    vertical-align: middle;
+}
+
+.seccion-inventario td:last-child {
+    white-space: nowrap;
+}
+
