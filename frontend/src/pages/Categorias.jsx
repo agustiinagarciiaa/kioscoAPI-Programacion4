@@ -1,8 +1,25 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { solicitar } from "../services/api";
 import useFetch from "../hooks/useFetch";
+
+// Validamos los datos con las mismas reglas que el backend.
+const validarCategoria = (nombre, descripcion) => {
+    if (!nombre.trim()) {
+        return "El nombre de la categoría es obligatorio.";
+    }
+
+    if (nombre.trim().length > 100) {
+        return "El nombre no puede superar los 100 caracteres.";
+    }
+
+    if (descripcion.trim().length > 255) {
+        return "La descripción no puede superar los 255 caracteres.";
+    }
+
+    return "";
+};
 
 function Categorias() {
     // Pedimos las categorías con el hook genérico.
@@ -14,38 +31,45 @@ function Categorias() {
         recargar: cargarCategorias
     } = useFetch("/categorias");
 
+    // Formulario de registro (arriba de la página).
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
-    const [idEditar, setIdEditar] = useState(null);
     const [mensaje, setMensaje] = useState("");
+
+    // Ventana de edición: null cuando está cerrada.
+    const [categoriaEditando, setCategoriaEditando] = useState(null);
+    const [errorEdicion, setErrorEdicion] = useState("");
+    const [guardandoEdicion, setGuardandoEdicion] = useState(false);
 
     const limpiarFormulario = () => {
         setNombre("");
         setDescripcion("");
-        setIdEditar(null);
     };
 
-    // Validamos el formulario con las mismas reglas que el backend.
-    const validarFormulario = () => {
-        if (!nombre.trim()) {
-            return "El nombre de la categoría es obligatorio.";
-        }
-
-        if (nombre.trim().length > 100) {
-            return "El nombre no puede superar los 100 caracteres.";
-        }
-
-        if (descripcion.trim().length > 255) {
-            return "La descripción no puede superar los 255 caracteres.";
-        }
-
-        return "";
+    const cerrarEdicion = () => {
+        setCategoriaEditando(null);
+        setErrorEdicion("");
     };
 
-    const guardarCategoria = async (e) => {
+    // La ventana también se cierra con la tecla Escape.
+    useEffect(() => {
+        if (!categoriaEditando) return;
+
+        const manejarTecla = (e) => {
+            if (e.key === "Escape") {
+                cerrarEdicion();
+            }
+        };
+
+        window.addEventListener("keydown", manejarTecla);
+
+        return () => window.removeEventListener("keydown", manejarTecla);
+    }, [categoriaEditando]);
+
+    const registrarCategoria = async (e) => {
         e.preventDefault();
 
-        const mensajeValidacion = validarFormulario();
+        const mensajeValidacion = validarCategoria(nombre, descripcion);
 
         if (mensajeValidacion) {
             setMensaje("");
@@ -57,27 +81,15 @@ function Categorias() {
             setError("");
             setMensaje("");
 
-            const datos = {
-                nombre: nombre.trim(),
-                descripcion: descripcion.trim()
-            };
+            await solicitar("/categorias", {
+                method: "POST",
+                body: JSON.stringify({
+                    nombre: nombre.trim(),
+                    descripcion: descripcion.trim()
+                })
+            });
 
-            if (idEditar) {
-                await solicitar(`/categorias/${idEditar}`, {
-                    method: "PUT",
-                    body: JSON.stringify(datos)
-                });
-
-                setMensaje("Categoría modificada correctamente.");
-            } else {
-                await solicitar("/categorias", {
-                    method: "POST",
-                    body: JSON.stringify(datos)
-                });
-
-                setMensaje("Categoría registrada correctamente.");
-            }
-
+            setMensaje("Categoría registrada correctamente.");
             limpiarFormulario();
             cargarCategorias();
         } catch (err) {
@@ -86,11 +98,49 @@ function Categorias() {
     };
 
     const editarCategoria = (categoria) => {
-        setIdEditar(categoria.id_categoria);
-        setNombre(categoria.nombre);
-        setDescripcion(categoria.descripcion || "");
+        setCategoriaEditando({
+            id: categoria.id_categoria,
+            nombre: categoria.nombre,
+            descripcion: categoria.descripcion || ""
+        });
+        setErrorEdicion("");
         setError("");
         setMensaje("");
+    };
+
+    const guardarEdicion = async (e) => {
+        e.preventDefault();
+
+        const mensajeValidacion = validarCategoria(
+            categoriaEditando.nombre,
+            categoriaEditando.descripcion
+        );
+
+        if (mensajeValidacion) {
+            setErrorEdicion(mensajeValidacion);
+            return;
+        }
+
+        try {
+            setGuardandoEdicion(true);
+            setErrorEdicion("");
+
+            await solicitar(`/categorias/${categoriaEditando.id}`, {
+                method: "PUT",
+                body: JSON.stringify({
+                    nombre: categoriaEditando.nombre.trim(),
+                    descripcion: categoriaEditando.descripcion.trim()
+                })
+            });
+
+            cerrarEdicion();
+            setMensaje("Categoría modificada correctamente.");
+            cargarCategorias();
+        } catch (err) {
+            setErrorEdicion(err.message);
+        } finally {
+            setGuardandoEdicion(false);
+        }
     };
 
     const eliminarCategoria = async (id) => {
@@ -127,13 +177,11 @@ function Categorias() {
             </header>
 
             <section className="seccion-inventario">
-                <h2>
-                    {idEditar ? "Modificar categoría" : "Registrar categoría"}
-                </h2>
+                <h2>Registrar categoría</h2>
 
                 <form
                     className="formulario-inventario"
-                    onSubmit={guardarCategoria}
+                    onSubmit={registrarCategoria}
                 >
                     {/* Cada campo agrupa su etiqueta y su input */}
                     <div className="campo">
@@ -163,15 +211,7 @@ function Categorias() {
 
                     {/* Botones en una fila aparte */}
                     <div className="acciones-formulario">
-                        <button type="submit">
-                            {idEditar ? "Guardar cambios" : "Registrar categoría"}
-                        </button>
-
-                        {idEditar && (
-                            <button type="button" onClick={limpiarFormulario}>
-                                Cancelar edición
-                            </button>
-                        )}
+                        <button type="submit">Registrar categoría</button>
                     </div>
                 </form>
 
@@ -236,6 +276,85 @@ function Categorias() {
                     </div>
                 )}
             </section>
+
+            {/* VENTANA EMERGENTE PARA MODIFICAR UNA CATEGORÍA */}
+            {categoriaEditando && (
+                <div className="modal-fondo" onClick={cerrarEdicion}>
+                    <div
+                        className="modal-ventana"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="tituloModalCategoria"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            className="modal-cerrar"
+                            onClick={cerrarEdicion}
+                            aria-label="Cerrar"
+                        >
+                            ×
+                        </button>
+
+                        <h2 id="tituloModalCategoria">Modificar categoría</h2>
+
+                        <form
+                            className="formulario-inventario"
+                            onSubmit={guardarEdicion}
+                        >
+                            <div className="campo">
+                                <label htmlFor="editarNombreCategoria">Nombre</label>
+                                <input
+                                    id="editarNombreCategoria"
+                                    type="text"
+                                    value={categoriaEditando.nombre}
+                                    onChange={(e) =>
+                                        setCategoriaEditando({
+                                            ...categoriaEditando,
+                                            nombre: e.target.value
+                                        })
+                                    }
+                                    maxLength={100}
+                                    autoFocus
+                                    required
+                                />
+                            </div>
+
+                            <div className="campo">
+                                <label htmlFor="editarDescripcionCategoria">
+                                    Descripción
+                                </label>
+                                <input
+                                    id="editarDescripcionCategoria"
+                                    type="text"
+                                    value={categoriaEditando.descripcion}
+                                    onChange={(e) =>
+                                        setCategoriaEditando({
+                                            ...categoriaEditando,
+                                            descripcion: e.target.value
+                                        })
+                                    }
+                                    maxLength={255}
+                                />
+                            </div>
+
+                            {errorEdicion && (
+                                <p className="mensaje-error">{errorEdicion}</p>
+                            )}
+
+                            <div className="acciones-formulario">
+                                <button type="submit" disabled={guardandoEdicion}>
+                                    {guardandoEdicion ? "Guardando..." : "Guardar cambios"}
+                                </button>
+
+                                <button type="button" onClick={cerrarEdicion}>
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

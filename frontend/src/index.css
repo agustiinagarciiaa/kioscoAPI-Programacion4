@@ -1220,3 +1220,120 @@ textarea {
         padding: 15px;
     }
 }
+
+
+/* ==========================================
+   VENTANA EMERGENTE (MODAL)
+   Para modificar sin moverse de la tabla
+========================================== */
+
+.modal-fondo {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(43, 29, 20, 0.55);
+    animation: aparecer-fondo 0.15s ease;
+}
+
+.modal-ventana {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    padding: 64px 28px 26px;
+    overflow: hidden;
+    background: var(--papel);
+    border: 3px solid var(--tinta);
+    border-radius: 16px;
+    box-shadow: 8px 8px 0 var(--amarillo);
+    animation: aparecer-ventana 0.18s ease;
+}
+
+/* El mismo toldo que el login */
+.modal-ventana::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    background: var(--toldo);
+}
+
+.modal-ventana h2 {
+    display: inline-block;
+    margin-bottom: 18px;
+    padding: 0 4px;
+    font-size: 22px;
+    background: linear-gradient(transparent 58%, var(--amarillo) 58%);
+}
+
+.modal-ventana .formulario-inventario {
+    grid-template-columns: 1fr;
+    margin-bottom: 0;
+}
+
+.modal-ventana .formulario-inventario .mensaje-error {
+    margin-top: 0;
+}
+
+.modal-ventana .acciones-formulario button[type="button"] {
+    background: white;
+}
+
+.modal-cerrar {
+    position: absolute;
+    top: 52px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--tinta);
+    border-radius: 50%;
+    background: white;
+    color: var(--tinta);
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.modal-cerrar:hover {
+    background: var(--rojo);
+    color: white;
+}
+
+@keyframes aparecer-fondo {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes aparecer-ventana {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+}
+
+/* Ventana más ancha para productos: campos en 2 columnas */
+.modal-ventana.modal-ancha {
+    max-width: 640px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.modal-ventana.modal-ancha .formulario-inventario {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.modal-ventana .formulario-inventario .mensaje-error {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 600px) {
+    .modal-ventana.modal-ancha .formulario-inventario {
+        grid-template-columns: 1fr;
+    }
+}

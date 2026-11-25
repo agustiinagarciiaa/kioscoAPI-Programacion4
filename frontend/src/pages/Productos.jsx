@@ -1,9 +1,167 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { solicitar } from "../services/api";
 import useProductos from "../hooks/useProductos";
 import useFetch from "../hooks/useFetch";
+
+// Valores iniciales del formulario de registro.
+const PRODUCTO_VACIO = {
+    nombre: "",
+    descripcion: "",
+    precio: "",
+    stock: "",
+    stockMinimo: "5",
+    idCategoria: ""
+};
+
+// Validamos los datos con las mismas reglas que el backend.
+const validarProducto = (datos) => {
+    const { nombre, descripcion, precio, stock, stockMinimo, idCategoria } = datos;
+
+    if (!nombre.trim()) {
+        return "El nombre del producto es obligatorio.";
+    }
+
+    if (nombre.trim().length > 150) {
+        return "El nombre no puede superar los 150 caracteres.";
+    }
+
+    if (descripcion.trim().length > 255) {
+        return "La descripción no puede superar los 255 caracteres.";
+    }
+
+    if (precio === "" || Number(precio) <= 0) {
+        return "El precio debe ser mayor que cero.";
+    }
+
+    if (Number(precio) > 99999999.99) {
+        return "El precio es demasiado alto.";
+    }
+
+    if (stock === "" || !Number.isInteger(Number(stock)) || Number(stock) < 0) {
+        return "El stock debe ser un número entero mayor o igual a cero.";
+    }
+
+    if (
+        stockMinimo === "" ||
+        !Number.isInteger(Number(stockMinimo)) ||
+        Number(stockMinimo) < 0
+    ) {
+        return "El stock mínimo debe ser un número entero mayor o igual a cero.";
+    }
+
+    if (!idCategoria) {
+        return "Seleccioná una categoría.";
+    }
+
+    return "";
+};
+
+// Convertimos los datos del formulario al formato que espera la API.
+const armarDatosApi = (datos) => ({
+    nombre: datos.nombre.trim(),
+    descripcion: datos.descripcion.trim(),
+    precio: Number(datos.precio),
+    stock: Number(datos.stock),
+    stock_minimo: Number(datos.stockMinimo),
+    id_categoria: Number(datos.idCategoria)
+});
+
+// Campos del producto. Se usan en el registro y en la ventana de edición;
+// "prefijo" evita que los ids se repitan entre los dos formularios.
+function CamposProducto({ datos, cambiar, categorias, prefijo }) {
+    const id = (nombreCampo) => `${prefijo}${nombreCampo}`;
+
+    return (
+        <>
+            {/* Cada campo agrupa su etiqueta y su input */}
+            <div className="campo">
+                <label htmlFor={id("nombre")}>Nombre</label>
+                <input
+                    id={id("nombre")}
+                    type="text"
+                    maxLength={150}
+                    value={datos.nombre}
+                    onChange={(e) => cambiar("nombre", e.target.value)}
+                    autoFocus={prefijo === "editar-"}
+                    required
+                />
+            </div>
+
+            <div className="campo">
+                <label htmlFor={id("descripcion")}>Descripción</label>
+                <input
+                    id={id("descripcion")}
+                    type="text"
+                    maxLength={255}
+                    value={datos.descripcion}
+                    onChange={(e) => cambiar("descripcion", e.target.value)}
+                />
+            </div>
+
+            <div className="campo">
+                <label htmlFor={id("precio")}>Precio</label>
+                <input
+                    id={id("precio")}
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={datos.precio}
+                    onChange={(e) => cambiar("precio", e.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="campo">
+                <label htmlFor={id("stock")}>Stock actual</label>
+                <input
+                    id={id("stock")}
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={datos.stock}
+                    onChange={(e) => cambiar("stock", e.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="campo">
+                <label htmlFor={id("stockMinimo")}>Stock mínimo</label>
+                <input
+                    id={id("stockMinimo")}
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={datos.stockMinimo}
+                    onChange={(e) => cambiar("stockMinimo", e.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="campo">
+                <label htmlFor={id("categoria")}>Categoría</label>
+                <select
+                    id={id("categoria")}
+                    value={datos.idCategoria}
+                    onChange={(e) => cambiar("idCategoria", e.target.value)}
+                    required
+                >
+                    <option value="">Seleccioná una categoría</option>
+
+                    {categorias.map((categoria) => (
+                        <option
+                            key={categoria.id_categoria}
+                            value={categoria.id_categoria}
+                        >
+                            {categoria.nombre}
+                        </option>
+                    ))}
+                </select>
+            </div>
+        </>
+    );
+}
 
 function Productos() {
     const {
@@ -21,71 +179,48 @@ function Productos() {
         error: errorCategorias
     } = useFetch("/categorias");
 
-    const [nombre, setNombre] = useState("");
-    const [descripcion, setDescripcion] = useState("");
-    const [precio, setPrecio] = useState("");
-    const [stock, setStock] = useState("");
-    const [stockMinimo, setStockMinimo] = useState("5");
-    const [idCategoria, setIdCategoria] = useState("");
-    const [idEditar, setIdEditar] = useState(null);
+    // Formulario de registro (arriba de la página).
+    const [nuevoProducto, setNuevoProducto] = useState(PRODUCTO_VACIO);
     const [mensaje, setMensaje] = useState("");
     const [guardando, setGuardando] = useState(false);
 
-    // Cargar categorías al abrir la página.
-    const limpiarFormulario = () => {
-        setNombre("");
-        setDescripcion("");
-        setPrecio("");
-        setStock("");
-        setStockMinimo("5");
-        setIdCategoria("");
-        setIdEditar(null);
+    // Ventana de edición: null cuando está cerrada.
+    const [productoEditando, setProductoEditando] = useState(null);
+    const [errorEdicion, setErrorEdicion] = useState("");
+    const [guardandoEdicion, setGuardandoEdicion] = useState(false);
+
+    const cambiarNuevo = (campo, valor) => {
+        setNuevoProducto((anterior) => ({ ...anterior, [campo]: valor }));
     };
 
-    const validarFormulario = () => {
-        if (!nombre.trim()) {
-            return "El nombre del producto es obligatorio.";
-        }
-
-        if (nombre.trim().length > 150) {
-            return "El nombre no puede superar los 150 caracteres.";
-        }
-
-        if (descripcion.trim().length > 255) {
-            return "La descripción no puede superar los 255 caracteres.";
-        }
-
-        if (precio === "" || Number(precio) <= 0) {
-            return "El precio debe ser mayor que cero.";
-        }
-
-        if (Number(precio) > 99999999.99) {
-            return "El precio es demasiado alto.";
-        }
-
-        if (stock === "" || !Number.isInteger(Number(stock)) || Number(stock) < 0) {
-            return "El stock debe ser un número entero mayor o igual a cero.";
-        }
-
-        if (
-            stockMinimo === "" ||
-            !Number.isInteger(Number(stockMinimo)) ||
-            Number(stockMinimo) < 0
-        ) {
-            return "El stock mínimo debe ser un número entero mayor o igual a cero.";
-        }
-
-        if (!idCategoria) {
-            return "Seleccioná una categoría.";
-        }
-
-        return "";
+    const cambiarEdicion = (campo, valor) => {
+        setProductoEditando((anterior) => ({ ...anterior, [campo]: valor }));
     };
 
-    const guardarProducto = async (e) => {
+    const cerrarEdicion = () => {
+        setProductoEditando(null);
+        setErrorEdicion("");
+    };
+
+    // La ventana también se cierra con la tecla Escape.
+    useEffect(() => {
+        if (!productoEditando) return;
+
+        const manejarTecla = (e) => {
+            if (e.key === "Escape") {
+                cerrarEdicion();
+            }
+        };
+
+        window.addEventListener("keydown", manejarTecla);
+
+        return () => window.removeEventListener("keydown", manejarTecla);
+    }, [productoEditando]);
+
+    const registrarProducto = async (e) => {
         e.preventDefault();
 
-        const mensajeValidacion = validarFormulario();
+        const mensajeValidacion = validarProducto(nuevoProducto);
 
         if (mensajeValidacion) {
             setMensaje("");
@@ -98,32 +233,13 @@ function Productos() {
             setError("");
             setMensaje("");
 
-            const datos = {
-                nombre: nombre.trim(),
-                descripcion: descripcion.trim(),
-                precio: Number(precio),
-                stock: Number(stock),
-                stock_minimo: Number(stockMinimo),
-                id_categoria: Number(idCategoria)
-            };
+            await solicitar("/productos", {
+                method: "POST",
+                body: JSON.stringify(armarDatosApi(nuevoProducto))
+            });
 
-            if (idEditar) {
-                await solicitar(`/productos/${idEditar}`, {
-                    method: "PUT",
-                    body: JSON.stringify(datos)
-                });
-
-                setMensaje("Producto modificado correctamente.");
-            } else {
-                await solicitar("/productos", {
-                    method: "POST",
-                    body: JSON.stringify(datos)
-                });
-
-                setMensaje("Producto registrado correctamente.");
-            }
-
-            limpiarFormulario();
+            setMensaje("Producto registrado correctamente.");
+            setNuevoProducto(PRODUCTO_VACIO);
             cargarProductos();
         } catch (err) {
             setError(err.message);
@@ -133,15 +249,47 @@ function Productos() {
     };
 
     const editarProducto = (producto) => {
-        setIdEditar(producto.id_producto);
-        setNombre(producto.nombre);
-        setDescripcion(producto.descripcion || "");
-        setPrecio(String(producto.precio));
-        setStock(String(producto.stock));
-        setStockMinimo(String(producto.stock_minimo));
-        setIdCategoria(String(producto.id_categoria));
+        setProductoEditando({
+            id: producto.id_producto,
+            nombre: producto.nombre,
+            descripcion: producto.descripcion || "",
+            precio: String(producto.precio),
+            stock: String(producto.stock),
+            stockMinimo: String(producto.stock_minimo),
+            idCategoria: String(producto.id_categoria)
+        });
+        setErrorEdicion("");
         setMensaje("");
         setError("");
+    };
+
+    const guardarEdicion = async (e) => {
+        e.preventDefault();
+
+        const mensajeValidacion = validarProducto(productoEditando);
+
+        if (mensajeValidacion) {
+            setErrorEdicion(mensajeValidacion);
+            return;
+        }
+
+        try {
+            setGuardandoEdicion(true);
+            setErrorEdicion("");
+
+            await solicitar(`/productos/${productoEditando.id}`, {
+                method: "PUT",
+                body: JSON.stringify(armarDatosApi(productoEditando))
+            });
+
+            cerrarEdicion();
+            setMensaje("Producto modificado correctamente.");
+            cargarProductos();
+        } catch (err) {
+            setErrorEdicion(err.message);
+        } finally {
+            setGuardandoEdicion(false);
+        }
     };
 
     const eliminarProducto = async (id) => {
@@ -176,97 +324,18 @@ function Productos() {
             </header>
 
             <section className="seccion-inventario">
-                <h2>
-                    {idEditar ? "Modificar producto" : "Registrar producto"}
-                </h2>
+                <h2>Registrar producto</h2>
 
                 <form
                     className="formulario-inventario"
-                    onSubmit={guardarProducto}
+                    onSubmit={registrarProducto}
                 >
-                    {/* Cada campo agrupa su etiqueta y su input */}
-                    <div className="campo">
-                        <label htmlFor="nombre">Nombre</label>
-                        <input
-                            id="nombre"
-                            type="text"
-                            maxLength={150}
-                            value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="campo">
-                        <label htmlFor="descripcion">Descripción</label>
-                        <input
-                            id="descripcion"
-                            type="text"
-                            maxLength={255}
-                            value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="campo">
-                        <label htmlFor="precio">Precio</label>
-                        <input
-                            id="precio"
-                            type="number"
-                            min="0.01"
-                            step="0.01"
-                            value={precio}
-                            onChange={(e) => setPrecio(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="campo">
-                        <label htmlFor="stock">Stock actual</label>
-                        <input
-                            id="stock"
-                            type="number"
-                            min="0"
-                            step="1"
-                            value={stock}
-                            onChange={(e) => setStock(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="campo">
-                        <label htmlFor="stockMinimo">Stock mínimo</label>
-                        <input
-                            id="stockMinimo"
-                            type="number"
-                            min="0"
-                            step="1"
-                            value={stockMinimo}
-                            onChange={(e) => setStockMinimo(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="campo">
-                        <label htmlFor="categoria">Categoría</label>
-                        <select
-                            id="categoria"
-                            value={idCategoria}
-                            onChange={(e) => setIdCategoria(e.target.value)}
-                            required
-                        >
-                            <option value="">Seleccioná una categoría</option>
-
-                            {categorias.map((categoria) => (
-                                <option
-                                    key={categoria.id_categoria}
-                                    value={categoria.id_categoria}
-                                >
-                                    {categoria.nombre}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <CamposProducto
+                        datos={nuevoProducto}
+                        cambiar={cambiarNuevo}
+                        categorias={categorias}
+                        prefijo=""
+                    />
 
                     {/* Botones en una fila aparte */}
                     <div className="acciones-formulario">
@@ -274,18 +343,8 @@ function Productos() {
                             type="submit"
                             disabled={guardando || cargandoCategorias}
                         >
-                            {guardando
-                                ? "Guardando..."
-                                : idEditar
-                                    ? "Guardar cambios"
-                                    : "Registrar producto"}
+                            {guardando ? "Guardando..." : "Registrar producto"}
                         </button>
-
-                        {idEditar && (
-                            <button type="button" onClick={limpiarFormulario}>
-                                Cancelar edición
-                            </button>
-                        )}
                     </div>
                 </form>
 
@@ -358,6 +417,56 @@ function Productos() {
                     </div>
                 )}
             </section>
+
+            {/* VENTANA EMERGENTE PARA MODIFICAR UN PRODUCTO */}
+            {productoEditando && (
+                <div className="modal-fondo" onClick={cerrarEdicion}>
+                    <div
+                        className="modal-ventana modal-ancha"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="tituloModalProducto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            className="modal-cerrar"
+                            onClick={cerrarEdicion}
+                            aria-label="Cerrar"
+                        >
+                            ×
+                        </button>
+
+                        <h2 id="tituloModalProducto">Modificar producto</h2>
+
+                        <form
+                            className="formulario-inventario"
+                            onSubmit={guardarEdicion}
+                        >
+                            <CamposProducto
+                                datos={productoEditando}
+                                cambiar={cambiarEdicion}
+                                categorias={categorias}
+                                prefijo="editar-"
+                            />
+
+                            {errorEdicion && (
+                                <p className="mensaje-error">{errorEdicion}</p>
+                            )}
+
+                            <div className="acciones-formulario">
+                                <button type="submit" disabled={guardandoEdicion}>
+                                    {guardandoEdicion ? "Guardando..." : "Guardar cambios"}
+                                </button>
+
+                                <button type="button" onClick={cerrarEdicion}>
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

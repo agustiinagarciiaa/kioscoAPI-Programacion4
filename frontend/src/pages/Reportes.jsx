@@ -1,5 +1,4 @@
 
-import { Link } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 
 function Reportes() {
@@ -88,8 +87,6 @@ function Reportes() {
                     <h1>Reportes del inventario</h1>
                     <p>Resumen general del kiosco.</p>
                 </div>
-
-                <Link to="/dashboard">Volver al inicio</Link>
             </header>
 
             {cargando ? (
