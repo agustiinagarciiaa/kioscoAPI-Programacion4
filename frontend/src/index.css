@@ -1871,3 +1871,267 @@ textarea {
     white-space: nowrap;
 }
 
+
+
+/* ==========================================
+   PANTALLAS MÁS CHICAS (NOTEBOOKS)
+   1) Las tarjetas nunca quedan más chicas que su contenido,
+      así no se superponen.
+   2) Cuanto más baja es la pantalla, más compacto el diseño,
+      para que todo siga entrando sin scrollear.
+========================================== */
+
+@media (min-width: 901px) {
+    .contenido-dashboard {
+        overflow-y: auto;
+    }
+
+    .seccion-accesos {
+        flex: 1 0 auto;
+        min-height: auto;
+    }
+
+    .tarjetas-dashboard {
+        flex: 1 0 auto;
+        min-height: auto;
+        grid-template-rows: repeat(2, minmax(min-content, 1fr));
+    }
+
+    .tarjeta-dashboard p {
+        overflow-wrap: anywhere;
+    }
+}
+
+/* Pantallas de hasta ~760 px de alto */
+@media (min-width: 901px) and (max-height: 760px) {
+    /* Menú lateral */
+    .menu-lateral {
+        padding: 56px 14px 10px;
+    }
+
+    .marca-dashboard {
+        margin-bottom: 8px;
+        padding: 8px;
+    }
+
+    .logo-dashboard {
+        width: 40px;
+        height: 40px;
+    }
+
+    .marca-dashboard h2 {
+        font-size: 20px;
+    }
+
+    .enlace-menu {
+        padding: 7px 12px;
+        font-size: 13px;
+    }
+
+    .usuario-menu {
+        padding: 8px 6px;
+    }
+
+    .avatar-usuario {
+        width: 32px;
+        height: 32px;
+        font-size: 15px;
+    }
+
+    .boton-cerrar-sesion {
+        padding: 7px 12px;
+    }
+
+    /* Inicio */
+    .contenido-dashboard {
+        padding: 12px 22px;
+    }
+
+    .barra-superior {
+        padding-bottom: 8px;
+    }
+
+    .barra-superior h1 {
+        font-size: 23px;
+    }
+
+    .etiqueta-sistema {
+        padding: 6px 13px;
+        font-size: 11px;
+    }
+
+    .bienvenida-panel {
+        margin: 10px 0;
+        padding: 10px 20px;
+        border-width: 6px;
+    }
+
+    .bienvenida-panel h2 {
+        margin: 2px 0;
+        font-size: 21px;
+    }
+
+    .bienvenida-panel p {
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .ilustracion-bienvenida {
+        width: 58px;
+        height: 58px;
+        font-size: 30px;
+    }
+
+    .titulo-seccion-dashboard {
+        margin-bottom: 8px;
+    }
+
+    .titulo-seccion-dashboard h2 {
+        font-size: 19px;
+    }
+
+    .titulo-seccion-dashboard p {
+        font-size: 13px;
+    }
+
+    .tarjetas-dashboard {
+        gap: 12px;
+    }
+
+    .tarjeta-dashboard {
+        grid-template-columns: 52px minmax(0, 1fr);
+        column-gap: 16px;
+        padding: 10px 18px;
+        border-top-width: 7px;
+    }
+
+    .icono-tarjeta {
+        width: 52px;
+        height: 52px;
+        font-size: 24px;
+    }
+
+    .tarjeta-dashboard h3 {
+        font-size: 20px;
+    }
+
+    .tarjeta-dashboard p {
+        margin-bottom: 8px;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .tarjeta-dashboard a {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+
+    .footer-dashboard {
+        margin-top: 10px;
+        padding-top: 6px;
+        font-size: 11px;
+    }
+
+    /* Páginas internas */
+    .contenido-seccion .pagina-inventario {
+        padding: 12px 22px;
+        gap: 10px;
+    }
+
+    .contenido-seccion .encabezado-dashboard {
+        padding: 8px 18px;
+    }
+
+    .contenido-seccion .encabezado-dashboard h1 {
+        font-size: 21px;
+    }
+
+    .contenido-seccion .encabezado-dashboard p {
+        font-size: 13px;
+    }
+
+    .contenido-seccion .seccion-inventario {
+        padding: 10px 16px;
+    }
+
+    .contenido-seccion .seccion-inventario h2 {
+        font-size: 17px;
+    }
+
+    .contenido-seccion .tarjeta-reporte {
+        padding: 9px 14px;
+    }
+
+    .contenido-seccion .tarjeta-reporte p {
+        font-size: 19px;
+    }
+
+    .seccion-inventario td {
+        height: 40px;
+    }
+}
+
+/* Pantallas de hasta ~640 px de alto: un poco más compacto */
+@media (min-width: 901px) and (max-height: 640px) {
+    .menu-separador {
+        padding: 4px 10px;
+    }
+
+    .navegacion-dashboard {
+        gap: 3px;
+    }
+
+    .enlace-menu {
+        padding: 6px 12px;
+    }
+
+    .bienvenida-panel {
+        padding: 8px 18px;
+    }
+
+    .bienvenida-panel h2 {
+        font-size: 19px;
+    }
+
+    .ilustracion-bienvenida {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+        border-width: 2px;
+    }
+
+    .titulo-seccion-dashboard p {
+        display: none;
+    }
+
+    .categoria-tarjeta {
+        font-size: 9px;
+    }
+
+    .tarjeta-dashboard {
+        padding: 8px 16px;
+    }
+
+    .icono-tarjeta {
+        width: 46px;
+        height: 46px;
+        font-size: 21px;
+    }
+
+    .tarjeta-dashboard h3 {
+        font-size: 18px;
+    }
+
+    .tarjeta-dashboard p {
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+
+    .seccion-inventario td {
+        height: 36px;
+    }
+
+    .contenido-seccion td {
+        padding: 5px 12px;
+    }
+}
